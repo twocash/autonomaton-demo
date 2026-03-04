@@ -104,6 +104,22 @@ npm run build
 
 ---
 
+---
+
+## 2026-03-04T19:15:00Z — Post-Implementation Audit
+
+**Status:** Complete
+
+### Findings & Fixes
+
+| Issue | Severity | Fix |
+|-------|----------|-----|
+| **Tier 0 crash** | CRITICAL | Cached skills (Tier 0) tried to access `modelConfig.tier0` which doesn't exist. Fixed: Tier 0 now bypasses API call entirely with local response. |
+| **Export inconsistency** | Minor | CognitiveAdapter not exported from services/index.ts. Fixed: Added export. |
+| **Gemini token counts** | Minor | usageMetadata available but not captured. Fixed: Now uses `response.usageMetadata.promptTokenCount` and `candidatesTokenCount`. |
+
+---
+
 ## Summary
 
 | Directive | Status | Implementation |
@@ -114,6 +130,7 @@ npm run build
 | Pipeline Integration | Complete | completeExecution() uses live calls |
 | Jidoka Integration | Complete | API errors trigger HALT_PIPELINE |
 | UI Feedback | Complete | 'executing' status with amber pulse |
+| Post-Audit | Complete | Tier 0 fix, export fix, Gemini token fix |
 
 ---
 
