@@ -1,5 +1,8 @@
 /**
- * Header — Mode toggle, Model Config, Andon Cord
+ * Header — Mode toggle, Model Config, Andon Cord, Deck Link
+ *
+ * Typography: Instrument Serif for logo
+ * No rounded corners (strict geometry)
  */
 
 import { useAppState, useAppDispatch } from '../../state/context'
@@ -18,28 +21,38 @@ export function Header() {
   }
 
   return (
-    <header className="border-b border-slate-700 px-6 py-4">
+    <header className="border-b border-grove-border px-6 py-4 bg-grove-bg2">
       <div className="flex items-center justify-between">
-        {/* Logo */}
+        {/* Logo — Instrument Serif */}
         <div>
-          <h1 className="text-xl font-semibold text-white">
+          <h1 className="text-xl font-serif text-grove-text">
             Grove Autonomaton
           </h1>
-          <p className="text-sm text-slate-400">Pattern Playground</p>
+          <p className="text-sm text-grove-text-dim">Pattern Playground</p>
         </div>
 
         <div className="flex items-center gap-6">
+          {/* Manifesto Link */}
+          <a
+            href="grove-autonomaton-deck.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-serif text-grove-amber hover:text-grove-amber-bright transition-colors text-sm"
+          >
+            [ Read the Pattern Deck ]
+          </a>
+
           {/* Andon Cord - Pull to simulate failure */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400">Andon:</span>
+            <span className="text-sm text-grove-text-dim">Andon:</span>
             <select
               value={simulateFailure}
               onChange={(e) => handleFailureToggle(e.target.value as FailureType)}
               className={`
-                text-sm px-3 py-1 rounded border
+                text-sm px-3 py-1 border
                 ${simulateFailure !== 'none'
-                  ? 'bg-red-950 border-red-500 text-red-300'
-                  : 'bg-slate-800 border-slate-600 text-slate-300'
+                  ? 'bg-grove-red/20 border-grove-red text-grove-red'
+                  : 'bg-grove-bg border-grove-border text-grove-text-mid'
                 }
               `}
             >
@@ -52,14 +65,14 @@ export function Header() {
 
           {/* Mode Toggle */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400">Mode:</span>
+            <span className="text-sm text-grove-text-dim">Mode:</span>
             <button
               onClick={handleModeToggle}
               className={`
-                px-3 py-1 rounded text-sm font-medium transition-colors
+                px-3 py-1 text-sm font-medium transition-colors
                 ${mode === 'demo'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-green-600 text-white'
+                  ? 'bg-grove-amber text-white'
+                  : 'bg-grove-green text-white'
                 }
               `}
             >

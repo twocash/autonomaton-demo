@@ -6,6 +6,8 @@
  *
  * The user watches their input flow through:
  * Telemetry → Recognition → Compilation → Approval → Execution
+ *
+ * Design: Strict geometry (no rounded), grove amber active state
  */
 
 import { usePipeline, useAppDispatch } from '../../state/context'
@@ -26,7 +28,7 @@ export function PipelineVisualization() {
   const dispatch = useAppDispatch()
 
   return (
-    <section className="border-b border-slate-700 bg-slate-800/50 py-6">
+    <section className="border-b border-grove-border bg-grove-bg2 py-6">
       <div className="flex items-center justify-center">
         {STAGES.map((stage, idx) => (
           <div key={stage} className="flex items-center">
@@ -49,23 +51,23 @@ export function PipelineVisualization() {
       {/* Halt reason display (Jidoka) */}
       {pipeline.halted && pipeline.haltReason && (
         <div className="mt-4 mx-auto max-w-2xl">
-          <div className="bg-red-950/50 border border-red-500/50 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-red-400 font-medium mb-2">
+          <div className="bg-grove-red/10 border border-grove-red/50 p-4">
+            <div className="flex items-center gap-2 text-grove-red font-medium mb-2">
               <span>🛑</span>
               <span>Pipeline Halted at {STAGE_META[pipeline.haltReason.stage]?.label}</span>
             </div>
-            <p className="text-sm text-red-300 mb-2">{pipeline.haltReason.error}</p>
-            <div className="text-xs text-slate-400">
-              <span className="text-slate-500">Expected: </span>
+            <p className="text-sm text-grove-red/80 mb-2">{pipeline.haltReason.error}</p>
+            <div className="text-xs text-grove-text-dim">
+              <span className="text-grove-text-dim">Expected: </span>
               {pipeline.haltReason.expected}
             </div>
-            <div className="text-xs text-blue-400 mt-2">
-              <span className="text-slate-500">Proposed fix: </span>
+            <div className="text-xs text-grove-amber mt-2">
+              <span className="text-grove-text-dim">Proposed fix: </span>
               {pipeline.haltReason.proposedFix}
             </div>
             <button
               onClick={() => dispatch({ type: 'RESET_PIPELINE' })}
-              className="mt-3 text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded transition-colors"
+              className="mt-3 text-xs bg-grove-border hover:bg-grove-border-light text-grove-text px-3 py-1 transition-colors"
             >
               Clear &amp; Reset Pipeline
             </button>

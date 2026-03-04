@@ -16,6 +16,8 @@
  * ├──────────────────────────────┴──────────────────────────────┤
  * │ Telemetry Stream                                            │
  * └─────────────────────────────────────────────────────────────┘
+ *
+ * Design System: Editorial Industrial (no rounded corners)
  */
 
 import { useAppState, useAppDispatch } from './state/context'
@@ -32,7 +34,7 @@ export default function App() {
   const dispatch = useAppDispatch()
 
   return (
-    <div className="h-screen bg-slate-900 text-slate-100 flex flex-col overflow-hidden">
+    <div className="h-screen bg-grove-bg text-grove-text flex flex-col overflow-hidden">
       <Header />
       <PipelineVisualization />
       <Dashboard />
@@ -46,7 +48,7 @@ export default function App() {
       <TelemetryStream />
 
       {/* Footer */}
-      <footer className="border-t border-slate-700 px-6 py-3 text-center text-xs text-slate-500">
+      <footer className="border-t border-grove-border px-6 py-3 text-center text-xs text-grove-text-dim">
         The Grove Autonomaton Pattern • CC BY 4.0 • thegrovefoundation.org
       </footer>
 
@@ -56,28 +58,28 @@ export default function App() {
       {/* Tutorial overlay */}
       {tutorial.active && tutorial.currentStep === 0 && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-slate-800 border border-slate-600 rounded-xl p-8 max-w-lg text-center">
-            <h2 className="text-2xl font-semibold text-white mb-4">
+          <div className="bg-grove-bg2 border border-grove-border p-8 max-w-lg text-center">
+            <h2 className="text-2xl font-serif text-grove-text mb-4">
               Welcome to the Pattern Playground
             </h2>
-            <p className="text-slate-300 mb-6">
+            <p className="text-grove-text-mid mb-6">
               This demo proves the Grove Autonomaton pattern through your own actions.
               You'll experience zone governance, live config editing, and the skill flywheel.
             </p>
-            <p className="text-sm text-slate-400 mb-6">
+            <p className="text-sm text-grove-text-dim mb-6">
               Ready to see software that identifies its own issues, proposes its own fixes,
               and authors its own evolution — inside zones you control?
             </p>
             <div className="flex gap-4 justify-center">
               <button
                 onClick={() => dispatch({ type: 'START_TUTORIAL' })}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                className="bg-grove-amber hover:bg-grove-amber-bright text-white px-6 py-2 font-medium transition-colors"
               >
                 Start Tutorial
               </button>
               <button
                 onClick={() => dispatch({ type: 'SKIP_TUTORIAL' })}
-                className="text-slate-400 hover:text-slate-300 px-4 py-2 text-sm"
+                className="text-grove-text-dim hover:text-grove-text-mid px-4 py-2 text-sm"
               >
                 Skip to Sandbox →
               </button>

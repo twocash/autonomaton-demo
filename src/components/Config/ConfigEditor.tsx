@@ -13,7 +13,8 @@
  * - models.config: Tier-to-model mappings (proves Claim #8)
  * - skills.library: Approved cached patterns
  *
- * v0.3: Added YAML syntax highlighting for visual clarity
+ * Typography: Fragment Mono for all config content
+ * Design: Strict geometry (no rounded)
  */
 
 import { useState, useEffect, useMemo, useRef } from 'react'
@@ -126,16 +127,16 @@ export function ConfigEditor() {
   const isEditable = activeTab === 'routing' || activeTab === 'models'
 
   return (
-    <div className="w-96 flex flex-col border-l border-slate-700 relative">
+    <div className="w-96 flex flex-col border-l border-grove-border bg-grove-bg2 relative">
       {/* Config Ripple Animation */}
       {configRipple && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute inset-0 bg-blue-500/20 animate-ripple" />
+          <div className="absolute inset-0 bg-grove-amber/20 animate-ripple" />
         </div>
       )}
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-700 overflow-x-auto">
+      <div className="flex border-b border-grove-border overflow-x-auto">
         <TabButton
           label="routing.config"
           active={activeTab === 'routing'}
@@ -186,20 +187,20 @@ export function ConfigEditor() {
       </div>
 
       {/* Validation & Save */}
-      <div className="border-t border-slate-700 p-3 flex items-center justify-between">
+      <div className="border-t border-grove-border p-3 flex items-center justify-between">
         <div className="text-xs">
           {error ? (
-            <span className="text-red-400">✗ {error}</span>
+            <span className="text-grove-red">✗ {error}</span>
           ) : isEditable ? (
-            <span className="text-green-400">✓ Valid</span>
+            <span className="text-grove-green">✓ Valid</span>
           ) : (
-            <span className="text-slate-500">Read-only</span>
+            <span className="text-grove-text-dim">Read-only</span>
           )}
         </div>
         {activeTab === 'routing' && (
           <button
             onClick={handleSaveRouting}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1 rounded text-sm font-medium transition-colors"
+            className="bg-grove-amber hover:bg-grove-amber-bright text-white px-4 py-1 text-sm font-medium transition-colors"
           >
             Apply Changes
           </button>
@@ -207,7 +208,7 @@ export function ConfigEditor() {
         {activeTab === 'models' && (
           <button
             onClick={handleSaveModels}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1 rounded text-sm font-medium transition-colors"
+            className="bg-grove-amber hover:bg-grove-amber-bright text-white px-4 py-1 text-sm font-medium transition-colors"
           >
             Apply Changes
           </button>
@@ -216,7 +217,7 @@ export function ConfigEditor() {
 
       {/* First-edit hint */}
       {!hasEdited && isEditable && (
-        <div className="absolute top-12 right-4 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg animate-bounce">
+        <div className="absolute top-12 right-4 bg-grove-amber text-white text-xs px-2 py-1 shadow-lg animate-bounce">
           Edit me — changes apply instantly!
         </div>
       )}
@@ -237,18 +238,18 @@ function TabButton({ label, active, onClick, highlight, badge }: TabButtonProps)
     <button
       onClick={onClick}
       className={`
-        relative px-3 py-2 text-xs font-medium transition-colors whitespace-nowrap
+        relative px-3 py-2 text-xs font-mono font-medium transition-colors whitespace-nowrap
         ${active
-          ? 'text-blue-400 border-b-2 border-blue-400'
+          ? 'text-grove-amber border-b-2 border-grove-amber'
           : highlight
-            ? 'text-yellow-400 hover:text-yellow-300'
-            : 'text-slate-400 hover:text-slate-300'
+            ? 'text-grove-yellow hover:text-grove-yellow/80'
+            : 'text-grove-text-dim hover:text-grove-text-mid'
         }
       `}
     >
       {label}
       {badge && (
-        <span className="absolute -top-1 -right-1 bg-tier-0 text-black text-[10px] px-1.5 rounded-full font-bold">
+        <span className="absolute -top-1 -right-1 bg-tier-0 text-black text-[10px] px-1.5 font-bold">
           {badge}
         </span>
       )}

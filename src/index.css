@@ -5,12 +5,17 @@
 /*
  * Grove Autonomaton Pattern Playground
  *
- * Design principles:
- * - Pipeline visualization is the hero element
- * - Zones are color-coded consistently (green/yellow/red)
- * - Monospace for telemetry/config, sans-serif for UI
- * - Numbers are prominent (engineers trust numbers)
- * - Animations feel satisfying, not decorative
+ * Editorial Industrial Design System
+ *
+ * Typography Trifecta:
+ * - Instrument Serif: Headers, metrics, CTAs
+ * - Fragment Mono: Config, telemetry, code
+ * - DM Sans: Standard UI, body text
+ *
+ * Principles:
+ * - Strict geometry (no rounded corners)
+ * - Dark industrial palette (#080808 base)
+ * - Amber (#D4621A) replaces blue for active states
  */
 
 /* =============================================================================
@@ -24,59 +29,70 @@
   --text-comment: #4B5563;
 
   /* YAML Syntax */
-  --yaml-key: #38BDF8;        /* Cyan - structural keys */
-  --yaml-number: #C084FC;     /* Purple - numbers/costs */
-  --yaml-string: #FCD34D;     /* Amber - string values */
-  --yaml-boolean: #F472B6;    /* Pink - true/false */
+  --yaml-key: #D4621A;          /* Grove amber - structural keys */
+  --yaml-number: #C084FC;       /* Purple - numbers/costs */
+  --yaml-string: #E8E2D9;       /* Grove text - string values */
+  --yaml-boolean: #F472B6;      /* Pink - true/false */
 
   /* Governance Zones (syntax) */
-  --yaml-zone-green: #10B981;
-  --yaml-zone-yellow: #F59E0B;
-  --yaml-zone-red: #EF4444;
+  --yaml-zone-green: #4CAF72;
+  --yaml-zone-yellow: #D4A017;
+  --yaml-zone-red: #C0392B;
+
+  /* Zone CSS variables for shadow effects */
+  --zone-green: #4CAF72;
+  --zone-yellow: #D4A017;
+  --zone-red: #C0392B;
+
+  /* Tier CSS variables */
+  --tier-0: #a855f7;
 }
 
 @layer base {
   body {
-    @apply bg-slate-900 text-slate-100 font-sans antialiased;
+    @apply bg-grove-bg text-grove-text font-sans antialiased;
   }
 
-  /* Scrollbar styling for the telemetry stream */
+  /* Industrial scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-grove-bg;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-grove-border;
+    border: 1px solid #080808;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-grove-border-light;
+  }
+
+  /* Firefox scrollbar */
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: theme('colors.slate.600') theme('colors.slate.800');
-  }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: theme('colors.slate.800');
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: theme('colors.slate.600');
-    border-radius: 4px;
+    scrollbar-color: #252525 #080808;
   }
 }
 
 @layer components {
   /* Pipeline stage states */
   .stage-idle {
-    @apply bg-pipeline-idle text-slate-400;
+    @apply bg-grove-border text-grove-text-dim;
   }
 
   .stage-active {
-    @apply bg-pipeline-active text-white;
+    @apply bg-grove-amber text-white;
     animation: stage-pulse 1.5s ease-in-out infinite;
   }
 
   .stage-complete {
-    @apply bg-pipeline-complete text-white;
+    @apply bg-grove-green text-white;
   }
 
   .stage-error {
-    @apply bg-pipeline-error text-white;
+    @apply bg-grove-red text-white;
     animation: stage-shake 0.5s ease-in-out;
   }
 
@@ -99,32 +115,31 @@
   .tier-2 { @apply bg-tier-2/20 text-tier-2 border-tier-2; }
   .tier-3 { @apply bg-tier-3/20 text-tier-3 border-tier-3; }
 
-  /* Config editor */
+  /* Config editor - no rounded */
   .config-editor {
-    @apply font-mono text-sm bg-slate-950 text-slate-300 p-4 rounded-lg;
-    @apply border border-slate-700 focus:border-blue-500 focus:outline-none;
+    @apply font-mono text-sm bg-grove-bg text-grove-text-mid p-4;
+    @apply border border-grove-border focus:border-grove-amber focus:outline-none;
     @apply resize-none;
     tab-size: 2;
   }
 
-  /* Syntax-highlighted YAML viewer (read-only) */
+  /* Syntax-highlighted YAML viewer (read-only) - no rounded */
   .yaml-viewer {
-    @apply font-mono text-sm bg-slate-950 p-4 rounded-lg;
-    @apply border border-slate-700;
+    @apply font-mono text-sm bg-grove-bg p-4;
+    @apply border border-grove-border;
     background: var(--bg-editor);
     tab-size: 2;
     white-space: pre-wrap;
     word-break: break-word;
   }
 
-  /* Syntax-highlighted YAML editor (editable) - container */
+  /* Syntax-highlighted YAML editor (editable) - container - no rounded */
   .yaml-editor-container {
-    @apply w-full rounded-lg;
-    @apply border border-slate-700;
+    @apply w-full;
+    @apply border border-grove-border;
     background: var(--bg-editor);
     min-height: 300px;
     display: grid;
-    /* Both children occupy same grid cell = overlap */
   }
 
   /* Syntax-highlighted YAML editor - backdrop layer */
@@ -145,7 +160,7 @@
     grid-area: 1 / 1;
     background: transparent;
     color: transparent;
-    caret-color: theme('colors.blue.400');
+    caret-color: #D4621A;
     tab-size: 2;
     white-space: pre-wrap;
     word-break: break-word;
@@ -155,11 +170,11 @@
   }
 
   .yaml-editor-container:focus-within {
-    @apply border-blue-500;
+    @apply border-grove-amber;
   }
 
   .yaml-editor-input::selection {
-    background: theme('colors.blue.500 / 30%');
+    background: rgba(212, 98, 26, 0.3);
   }
 
   /* YAML syntax elements */
@@ -201,43 +216,43 @@
     font-weight: 600;
   }
 
-  /* Telemetry entry */
+  /* Telemetry entry - no rounded */
   .telemetry-entry {
-    @apply font-mono text-xs bg-slate-950 p-2 rounded border-l-2 border-slate-700;
-    @apply hover:border-green-500 cursor-pointer transition-colors;
+    @apply font-mono text-xs bg-grove-bg p-2 border-l-2 border-grove-border;
+    @apply hover:border-grove-green cursor-pointer transition-colors;
   }
 
   .telemetry-entry.selected {
-    @apply border-green-500 bg-green-950/30;
+    @apply border-grove-green bg-grove-green/10;
   }
 
   /* Terminal-style telemetry stream */
   .terminal-stream {
-    @apply bg-slate-950 font-mono;
-    text-shadow: 0 0 2px theme('colors.green.400 / 30%');
+    @apply bg-grove-bg font-mono;
+    text-shadow: 0 0 2px rgba(76, 175, 114, 0.3);
   }
 
   .terminal-stream .timestamp {
-    @apply text-green-600;
+    @apply text-grove-green;
   }
 
   .terminal-stream .key {
-    @apply text-green-400;
+    color: #6EE7B7;
   }
 
   .terminal-stream .value {
-    @apply text-slate-300;
+    @apply text-grove-text-mid;
   }
 
   .terminal-stream .bracket {
-    @apply text-slate-500;
+    @apply text-grove-text-dim;
   }
 }
 
 @layer utilities {
-  /* Config ripple - the "no deploy" proof */
+  /* Config ripple - the "no deploy" proof - no rounded */
   .config-ripple {
-    @apply absolute inset-0 rounded-lg bg-blue-500/30;
+    @apply absolute inset-0 bg-grove-amber/30;
     animation: ripple 0.6s ease-out forwards;
   }
 
@@ -247,15 +262,15 @@
   }
 }
 
-/* Keyframe animations */
+/* Keyframe animations - using grove amber */
 @keyframes stage-pulse {
   0%, 100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 theme('colors.blue.500 / 40%');
+    box-shadow: 0 0 0 0 rgba(212, 98, 26, 0.4);
   }
   50% {
     opacity: 0.8;
-    box-shadow: 0 0 0 8px theme('colors.blue.500 / 0%');
+    box-shadow: 0 0 0 8px rgba(212, 98, 26, 0);
   }
 }
 
@@ -308,15 +323,15 @@
   animation: slide-up 0.3s ease-out;
 }
 
-/* Pulse border for config editor invitation */
+/* Pulse border for config editor invitation - using grove amber */
 @keyframes pulse-border {
   0%, 100% {
-    border-color: theme('colors.slate.700');
-    box-shadow: 0 0 0 0 theme('colors.blue.500 / 0%');
+    border-color: #252525;
+    box-shadow: 0 0 0 0 rgba(212, 98, 26, 0);
   }
   50% {
-    border-color: theme('colors.blue.500');
-    box-shadow: 0 0 8px 2px theme('colors.blue.500 / 30%');
+    border-color: #D4621A;
+    box-shadow: 0 0 8px 2px rgba(212, 98, 26, 0.3);
   }
 }
 

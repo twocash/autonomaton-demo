@@ -3,6 +3,9 @@
  *
  * Shows: Total Cost, Interaction Count, Average Tier, % Local, Skills Fired
  * The key insight: cost trends DOWN while capability stays flat.
+ *
+ * Typography: Instrument Serif for metric values
+ * Design: Strict geometry (no rounded)
  */
 
 import { useMetrics, useSkills } from '../../state/context'
@@ -26,7 +29,7 @@ export function Dashboard() {
   const localTrend = getLocalTrend(metrics.localCount, metrics.interactionCount)
 
   return (
-    <section className="border-b border-slate-700 px-6 py-4 bg-slate-800/30">
+    <section className="border-b border-grove-border px-6 py-4 bg-grove-bg2/50">
       <div className="flex items-center justify-center gap-4">
         <MetricCard
           label="Total Cost"
@@ -83,23 +86,23 @@ function MetricCard({
   trendGoodDirection,
   sparkline,
   highlight,
-  accentColor = 'text-white'
+  accentColor = 'text-grove-text'
 }: MetricCardProps) {
   const trendColor = trend && trendGoodDirection
-    ? (trend === trendGoodDirection ? 'text-green-400' : trend === 'flat' ? 'text-slate-500' : 'text-amber-400')
-    : 'text-slate-500'
+    ? (trend === trendGoodDirection ? 'text-grove-green' : trend === 'flat' ? 'text-grove-text-dim' : 'text-grove-amber')
+    : 'text-grove-text-dim'
 
   const trendArrow = trend === 'up' ? '↑' : trend === 'down' ? '↓' : trend === 'flat' ? '→' : ''
 
   return (
     <div className={`
-      bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-3 min-w-[120px]
-      ${highlight ? 'border-green-500/30 bg-green-950/20' : ''}
+      bg-grove-bg3 border border-grove-border px-4 py-3 min-w-[120px]
+      ${highlight ? 'border-grove-green/30 bg-grove-green/5' : ''}
       transition-all duration-300
     `}>
-      <div className="text-xs text-slate-400 mb-1">{label}</div>
+      <div className="text-xs text-grove-text-dim mb-1">{label}</div>
       <div className="flex items-center gap-2">
-        <span className={`font-mono font-semibold text-lg ${highlight ? 'text-green-400' : accentColor}`}>
+        <span className={`font-serif font-semibold text-lg ${highlight ? 'text-grove-green' : accentColor}`}>
           {value}
         </span>
         {trend && (
@@ -137,7 +140,7 @@ function MiniSparkline({ data }: { data: number[] }) {
         fill="none"
         stroke="currentColor"
         strokeWidth="1.5"
-        className="text-slate-400"
+        className="text-grove-text-dim"
       />
     </svg>
   )

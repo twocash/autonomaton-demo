@@ -9,6 +9,9 @@
  * - Click entry → highlights corresponding interaction
  * - Export audit log as JSON
  * - Terminal-style green tint for visual distinction from chat UI
+ *
+ * Typography: Fragment Mono for all content
+ * Design: Strict geometry (no rounded)
  */
 
 import { useTelemetry, useAppDispatch, useAppState } from '../../state/context'
@@ -34,23 +37,23 @@ export function TelemetryStream() {
   }
 
   return (
-    <section className="h-48 border-t border-slate-700 bg-slate-950 flex flex-col terminal-stream">
+    <section className="h-48 border-t border-grove-border bg-grove-bg flex flex-col terminal-stream">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800/50">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-grove-border/50">
         <div className="flex items-center gap-2">
-          <span className="text-green-500 animate-pulse">●</span>
-          <span className="text-sm font-medium text-green-400/80">
+          <span className="text-grove-green animate-pulse">●</span>
+          <span className="text-sm font-mono font-medium text-grove-green/80">
             Telemetry Stream
           </span>
           {telemetry.length > 0 && (
-            <span className="text-xs text-green-600">
+            <span className="text-xs font-mono text-grove-green/60">
               ({telemetry.length} entries)
             </span>
           )}
         </div>
         <button
           onClick={handleExport}
-          className="text-xs text-green-400 hover:text-green-300 transition-colors border border-green-800 hover:border-green-600 px-2 py-0.5 rounded"
+          className="text-xs font-mono text-grove-green hover:text-grove-green/80 transition-colors border border-grove-green/30 hover:border-grove-green/60 px-2 py-0.5"
         >
           Export Audit Log
         </button>
@@ -59,11 +62,11 @@ export function TelemetryStream() {
       {/* Stream */}
       <div className="flex-1 p-2 overflow-y-auto scrollbar-thin font-mono text-xs">
         {telemetry.length === 0 ? (
-          <div className="text-green-700 p-2 space-y-1">
-            <p><span className="text-green-500">&gt;</span> Telemetry entries will appear here...</p>
-            <p><span className="text-green-500">&gt;</span> Each interaction generates a structured audit record</p>
-            <p><span className="text-green-500">&gt;</span> Click any entry to highlight the corresponding interaction</p>
-            <p className="text-green-800 mt-4">_</p>
+          <div className="text-grove-green/50 p-2 space-y-1">
+            <p><span className="text-grove-green">&gt;</span> Telemetry entries will appear here...</p>
+            <p><span className="text-grove-green">&gt;</span> Each interaction generates a structured audit record</p>
+            <p><span className="text-grove-green">&gt;</span> Click any entry to highlight the corresponding interaction</p>
+            <p className="text-grove-green/30 mt-4">_</p>
           </div>
         ) : (
           <div className="space-y-1">
@@ -76,18 +79,18 @@ export function TelemetryStream() {
                   ${selectedTelemetryId === entry.id ? 'selected' : ''}
                 `}
               >
-                <span className="text-green-600 font-semibold">{entry.timestamp.slice(11, 19)}</span>
-                <span className="text-slate-600"> │ </span>
-                <span className="text-green-400">{entry.intent}</span>
-                <span className="text-slate-600"> │ </span>
+                <span className="text-grove-green font-semibold">{entry.timestamp.slice(11, 19)}</span>
+                <span className="text-grove-text-dim"> │ </span>
+                <span className="text-grove-green/80">{entry.intent}</span>
+                <span className="text-grove-text-dim"> │ </span>
                 <TierBadge tier={entry.tier} />
-                <span className="text-slate-600"> │ </span>
+                <span className="text-grove-text-dim"> │ </span>
                 <ZoneBadge zone={entry.zone} />
-                <span className="text-slate-600"> │ </span>
-                <span className="text-green-300">${entry.cost.toFixed(4)}</span>
+                <span className="text-grove-text-dim"> │ </span>
+                <span className="text-grove-text-mid">${entry.cost.toFixed(4)}</span>
                 {entry.skillMatch && (
                   <>
-                    <span className="text-slate-600"> │ </span>
+                    <span className="text-grove-text-dim"> │ </span>
                     <span className="text-tier-0">⚡cached</span>
                   </>
                 )}
@@ -107,7 +110,7 @@ function TierBadge({ tier }: { tier: number }) {
     2: 'text-tier-2',
     3: 'text-tier-3',
   }
-  return <span className={colors[tier] || 'text-slate-400'}>T{tier}</span>
+  return <span className={colors[tier] || 'text-grove-text-dim'}>T{tier}</span>
 }
 
 function ZoneBadge({ zone }: { zone: string }) {
@@ -116,5 +119,5 @@ function ZoneBadge({ zone }: { zone: string }) {
     yellow: 'text-zone-yellow',
     red: 'text-zone-red',
   }
-  return <span className={colors[zone] || 'text-slate-400'}>{zone}</span>
+  return <span className={colors[zone] || 'text-grove-text-dim'}>{zone}</span>
 }

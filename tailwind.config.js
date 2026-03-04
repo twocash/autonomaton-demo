@@ -7,15 +7,32 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        serif: ['"Instrument Serif"', 'serif'],
+        mono: ['"Fragment Mono"', 'Consolas', 'monospace'],
       },
       colors: {
-        // Zone governance colors — used throughout for consistent visual language
+        // Grove Industrial Palette
+        grove: {
+          bg: '#080808',           // App root background
+          bg2: '#0f0f0f',          // Panel background (chat, config)
+          bg3: '#161616',          // Elevated cards (interaction bubbles)
+          border: '#252525',       // Standard borders
+          'border-light': '#333333', // Hover state borders
+          amber: '#D4621A',        // Primary active color
+          'amber-bright': '#F07030', // Hover active color
+          text: '#E8E2D9',         // Primary text
+          'text-dim': '#7A736A',   // Muted/Placeholder text
+          'text-mid': '#B0A898',   // Secondary text
+          green: '#4CAF72',        // Zone: Auto
+          yellow: '#D4A017',       // Zone: Supervised
+          red: '#C0392B',          // Zone: Human-Only
+        },
+        // Zone governance colors (aliased for semantic use)
         zone: {
-          green: '#22c55e',   // Autonomous: execute without asking
-          yellow: '#eab308',  // Supervised: propose, human approves
-          red: '#ef4444',     // Human-only: surface info, wait
+          green: '#4CAF72',
+          yellow: '#D4A017',
+          red: '#C0392B',
         },
         // Tier colors — cognitive routing visualization
         tier: {
@@ -24,12 +41,12 @@ export default {
           2: '#f97316',  // Orange: premium cognition
           3: '#dc2626',  // Red: apex cognition
         },
-        // Pipeline stage colors
+        // Pipeline stage colors (using grove amber for active)
         pipeline: {
-          idle: '#475569',     // slate-600
-          active: '#3b82f6',   // blue-500
-          complete: '#22c55e', // green-500
-          error: '#ef4444',    // red-500
+          idle: '#252525',
+          active: '#D4621A',      // Grove amber
+          complete: '#4CAF72',    // Grove green
+          error: '#C0392B',       // Grove red
         }
       },
       animation: {

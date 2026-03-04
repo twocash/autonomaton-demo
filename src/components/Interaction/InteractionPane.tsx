@@ -8,6 +8,11 @@
  * - Pattern tracking badge ("👀 Observed N/3")
  * - Run Again button on completed interactions
  * - Persistent Prompt Tray above input
+ *
+ * v0.4 Design:
+ * - Strict geometry (no rounded)
+ * - Grove color palette
+ * - Amber active states
  */
 
 import { useState, useRef, useEffect } from 'react'
@@ -108,13 +113,13 @@ export function InteractionPane() {
   }, [state.interactions, pendingApproval])
 
   return (
-    <div className="flex-1 border-r border-slate-700 flex flex-col min-h-0">
+    <div className="flex-1 border-r border-grove-border bg-grove-bg2 flex flex-col min-h-0">
       {/* Interaction List */}
       <div className="flex-1 p-6 overflow-y-auto scrollbar-thin min-h-0">
         {state.interactions.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-xl font-semibold text-white mb-2">Welcome to the Pattern Playground</p>
-            <p className="text-sm text-slate-400 mb-8">
+            <p className="text-xl font-serif text-grove-text mb-2">Welcome to the Pattern Playground</p>
+            <p className="text-sm text-grove-text-dim mb-8">
               {tutorial.active
                 ? 'Follow the tutorial to experience the Autonomaton pattern.'
                 : 'Click any button to see the pattern in action.'}
@@ -124,38 +129,38 @@ export function InteractionPane() {
               <button
                 onClick={() => handlePreset('capture my idea about project architecture')}
                 disabled={processing}
-                className="flex items-center gap-3 px-4 py-3 bg-slate-800/80 hover:bg-slate-700/80 border border-zone-green/30 hover:border-zone-green rounded-lg text-left transition-all group disabled:opacity-50"
+                className="flex items-center gap-3 px-4 py-3 bg-grove-bg3 hover:bg-grove-border border border-zone-green/30 hover:border-zone-green text-left transition-all group disabled:opacity-50"
               >
-                <span className="w-3 h-3 rounded-full bg-zone-green shadow-[0_0_8px_var(--zone-green)]" />
+                <span className="w-3 h-3 bg-zone-green shadow-[0_0_8px_var(--zone-green)]" />
                 <div className="flex-1">
-                  <div className="text-white font-medium text-sm group-hover:text-zone-green transition-colors">Capture a quick thought</div>
-                  <div className="text-xs text-slate-500">Auto-executes (Green Zone)</div>
+                  <div className="text-grove-text font-medium text-sm group-hover:text-zone-green transition-colors">Capture a quick thought</div>
+                  <div className="text-xs text-grove-text-dim">Auto-executes (Green Zone)</div>
                 </div>
-                <span className="text-slate-600 text-xs">T1</span>
+                <span className="text-grove-text-dim text-xs font-mono">T1</span>
               </button>
               <button
                 onClick={() => handlePreset('research best practices for API design')}
                 disabled={processing}
-                className="flex items-center gap-3 px-4 py-3 bg-slate-800/80 hover:bg-slate-700/80 border border-zone-yellow/30 hover:border-zone-yellow rounded-lg text-left transition-all group disabled:opacity-50"
+                className="flex items-center gap-3 px-4 py-3 bg-grove-bg3 hover:bg-grove-border border border-zone-yellow/30 hover:border-zone-yellow text-left transition-all group disabled:opacity-50"
               >
-                <span className="w-3 h-3 rounded-full bg-zone-yellow shadow-[0_0_8px_var(--zone-yellow)]" />
+                <span className="w-3 h-3 bg-zone-yellow shadow-[0_0_8px_var(--zone-yellow)]" />
                 <div className="flex-1">
-                  <div className="text-white font-medium text-sm group-hover:text-zone-yellow transition-colors">Deep dive on API design</div>
-                  <div className="text-xs text-slate-500">Requires Approval (Yellow Zone)</div>
+                  <div className="text-grove-text font-medium text-sm group-hover:text-zone-yellow transition-colors">Deep dive on API design</div>
+                  <div className="text-xs text-grove-text-dim">Requires Approval (Yellow Zone)</div>
                 </div>
-                <span className="text-slate-600 text-xs">T2</span>
+                <span className="text-grove-text-dim text-xs font-mono">T2</span>
               </button>
               <button
                 onClick={() => handlePreset('delete all user data')}
                 disabled={processing}
-                className="flex items-center gap-3 px-4 py-3 bg-slate-800/80 hover:bg-slate-700/80 border border-zone-red/30 hover:border-zone-red rounded-lg text-left transition-all group disabled:opacity-50"
+                className="flex items-center gap-3 px-4 py-3 bg-grove-bg3 hover:bg-grove-border border border-zone-red/30 hover:border-zone-red text-left transition-all group disabled:opacity-50"
               >
-                <span className="w-3 h-3 rounded-full bg-zone-red shadow-[0_0_8px_var(--zone-red)]" />
+                <span className="w-3 h-3 bg-zone-red shadow-[0_0_8px_var(--zone-red)]" />
                 <div className="flex-1">
-                  <div className="text-white font-medium text-sm group-hover:text-zone-red transition-colors">Delete all user data</div>
-                  <div className="text-xs text-slate-500">Info Only (Red Zone)</div>
+                  <div className="text-grove-text font-medium text-sm group-hover:text-zone-red transition-colors">Delete all user data</div>
+                  <div className="text-xs text-grove-text-dim">Info Only (Red Zone)</div>
                 </div>
-                <span className="text-slate-600 text-xs">T3</span>
+                <span className="text-grove-text-dim text-xs font-mono">T3</span>
               </button>
             </div>
           </div>
@@ -178,15 +183,15 @@ export function InteractionPane() {
 
         {/* Pending Approval Card */}
         {pendingApproval && (
-          <div className="mt-4 bg-yellow-950/30 border border-zone-yellow rounded-lg p-4">
+          <div className="mt-4 bg-zone-yellow/10 border border-zone-yellow p-4">
             <div className="flex items-center gap-2 text-zone-yellow font-medium mb-2">
               <span>✋</span>
               <span>Approval Required</span>
             </div>
-            <p className="text-sm text-slate-300 mb-2">
+            <p className="text-sm text-grove-text-mid mb-2">
               This action is in the <strong>YELLOW ZONE</strong> — it requires your approval before proceeding.
             </p>
-            <div className="text-xs text-slate-400 mb-4 bg-slate-900/50 rounded p-2">
+            <div className="text-xs text-grove-text-dim mb-4 bg-grove-bg/50 p-2 font-mono">
               <strong>Intent:</strong> {pendingApproval.intent}<br />
               <strong>Tier:</strong> {pendingApproval.tier}<br />
               <strong>Estimated cost:</strong> ${pendingApproval.cost.toFixed(4)}
@@ -195,14 +200,14 @@ export function InteractionPane() {
               <button
                 onClick={handleApprove}
                 disabled={processing}
-                className="bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+                className="bg-grove-green hover:bg-grove-green/80 disabled:opacity-50 text-white px-4 py-2 text-sm font-medium transition-colors"
               >
                 {processing ? 'Processing...' : 'Approve'}
               </button>
               <button
                 onClick={handleReject}
                 disabled={processing}
-                className="bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+                className="bg-grove-border hover:bg-grove-border-light disabled:opacity-50 text-grove-text px-4 py-2 text-sm font-medium transition-colors"
               >
                 Reject
               </button>
@@ -222,7 +227,7 @@ export function InteractionPane() {
       )}
 
       {/* Input Area */}
-      <form onSubmit={handleSubmit} className="border-t border-slate-700 p-4">
+      <form onSubmit={handleSubmit} className="border-t border-grove-border p-4">
         <div className="flex gap-2">
           <input
             type="text"
@@ -230,12 +235,12 @@ export function InteractionPane() {
             onChange={(e) => setInput(e.target.value)}
             placeholder={processing ? 'Processing...' : 'Type your request...'}
             disabled={processing || !!pendingApproval}
-            className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 disabled:opacity-50"
+            className="flex-1 bg-grove-bg border border-grove-border px-4 py-2 text-grove-text placeholder-grove-text-dim focus:outline-none focus:border-grove-amber disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={processing || !!pendingApproval || !input.trim()}
-            className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors"
+            className="bg-grove-amber hover:bg-grove-amber-bright disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 font-medium transition-colors"
           >
             {processing ? '...' : 'Send'}
           </button>
@@ -261,12 +266,12 @@ function InteractionCard({ interaction, isSelected, hasSkill, onRunAgain, proces
   return (
     <div
       className={`
-        relative bg-slate-800/50 rounded-lg p-4 border-l-4 transition-all group
+        relative bg-grove-bg3 p-4 border-l-4 transition-all group
         ${interaction.zone === 'green' ? 'border-zone-green' : ''}
         ${interaction.zone === 'yellow' ? 'border-zone-yellow' : ''}
         ${interaction.zone === 'red' ? 'border-zone-red' : ''}
         ${interaction.status === 'pending' ? 'opacity-70' : ''}
-        ${isSelected ? 'ring-2 ring-blue-500' : ''}
+        ${isSelected ? 'ring-2 ring-grove-amber' : ''}
       `}
     >
       {/* Run Again Button */}
@@ -275,36 +280,36 @@ function InteractionCard({ interaction, isSelected, hasSkill, onRunAgain, proces
           onClick={onRunAgain}
           disabled={processing}
           title="Run again"
-          className="absolute top-3 right-3 p-1.5 text-slate-500 hover:text-white hover:bg-slate-700 rounded transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50"
+          className="absolute top-3 right-3 p-1.5 text-grove-text-dim hover:text-grove-text hover:bg-grove-border transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50"
         >
           🔁
         </button>
       )}
 
       {/* User Input */}
-      <div className="text-sm text-slate-400 mb-2 flex items-center gap-2">
-        <span className="text-slate-500">›</span>
+      <div className="text-sm text-grove-text-dim mb-2 flex items-center gap-2">
+        <span className="text-grove-text-dim">›</span>
         {interaction.input}
       </div>
 
       {/* Metadata Badges */}
-      <div className="flex items-center gap-3 text-xs mb-3 flex-wrap">
-        <span className={`tier-${interaction.tier} px-2 py-0.5 rounded border`}>
+      <div className="flex items-center gap-3 text-xs mb-3 flex-wrap font-mono">
+        <span className={`tier-${interaction.tier} px-2 py-0.5 border`}>
           T{interaction.tier}: {interaction.tier === 0 ? 'Cached' : interaction.tier === 1 ? 'Cheap' : interaction.tier === 2 ? 'Premium' : 'Apex'}
         </span>
-        <span className={`zone-${interaction.zone} px-2 py-0.5 rounded border capitalize`}>
+        <span className={`zone-${interaction.zone} px-2 py-0.5 border capitalize`}>
           {interaction.zone}
         </span>
-        <span className="text-slate-500">
+        <span className="text-grove-text-dim">
           ${interaction.cost.toFixed(4)}
         </span>
         {interaction.skillMatch && (
-          <span className="text-tier-0 px-2 py-0.5 rounded border border-tier-0">
+          <span className="text-tier-0 px-2 py-0.5 border border-tier-0">
             ⚡ Skill
           </span>
         )}
         {interaction.sovereignty === 'local' && (
-          <span className="text-green-400 text-xs">🏠 Local</span>
+          <span className="text-grove-green text-xs">🏠 Local</span>
         )}
 
         {/* Pattern Tracking Badge */}
@@ -313,20 +318,20 @@ function InteractionCard({ interaction, isSelected, hasSkill, onRunAgain, proces
 
       {/* Response */}
       {interaction.response && (
-        <div className="text-sm text-slate-300 whitespace-pre-wrap bg-slate-900/50 rounded p-3">
+        <div className="text-sm text-grove-text-mid whitespace-pre-wrap bg-grove-bg/50 p-3">
           {interaction.response}
         </div>
       )}
 
       {/* Status indicator */}
       {interaction.status === 'pending' && (
-        <div className="text-xs text-slate-500 mt-2 flex items-center gap-2">
+        <div className="text-xs text-grove-text-dim mt-2 flex items-center gap-2">
           <span className="animate-pulse">●</span>
           Processing...
         </div>
       )}
       {interaction.status === 'rejected' && (
-        <div className="text-xs text-red-400 mt-2">
+        <div className="text-xs text-grove-red mt-2">
           ✗ Rejected by user
         </div>
       )}
@@ -349,7 +354,7 @@ function PatternBadge({ interaction, hasSkill }: PatternBadgeProps) {
   // If this intent now has a skill, show "Cached Skill"
   if (hasSkill && !interaction.skillMatch) {
     return (
-      <span className="text-tier-0 px-2 py-0.5 rounded border border-tier-0 animate-pulse">
+      <span className="text-tier-0 px-2 py-0.5 border border-tier-0 animate-pulse">
         ⚡ Cached Skill
       </span>
     )
@@ -361,14 +366,14 @@ function PatternBadge({ interaction, hasSkill }: PatternBadgeProps) {
   // Show the observation count
   if (count >= 3) {
     return (
-      <span className="text-amber-400 px-2 py-0.5 rounded border border-amber-500/50 animate-pulse">
+      <span className="text-grove-amber px-2 py-0.5 border border-grove-amber/50 animate-pulse">
         ⚡ Skill Proposed!
       </span>
     )
   }
 
   return (
-    <span className="text-slate-400 px-2 py-0.5 rounded border border-slate-600">
+    <span className="text-grove-text-dim px-2 py-0.5 border border-grove-border">
       👀 Observed ({count}/3)
     </span>
   )
@@ -390,7 +395,7 @@ function PromptTray({ presets, skills, onSelect, disabled }: PromptTrayProps) {
     skills.some((s) => s.intentMatch === intent)
 
   return (
-    <div className="border-t border-slate-700/50 px-4 py-2 bg-slate-900/50">
+    <div className="border-t border-grove-border/50 px-4 py-2 bg-grove-bg/50">
       <div className="flex gap-2 overflow-x-auto scrollbar-thin pb-1">
         {presets.map((preset) => {
           const skilled = hasSkill(preset.intent)
@@ -400,16 +405,16 @@ function PromptTray({ presets, skills, onSelect, disabled }: PromptTrayProps) {
               onClick={() => onSelect(preset.input)}
               disabled={disabled}
               className={`
-                flex items-center gap-2 px-3 py-1.5 rounded-full text-xs whitespace-nowrap
+                flex items-center gap-2 px-3 py-1.5 text-xs font-mono whitespace-nowrap
                 transition-all disabled:opacity-50
                 ${skilled
                   ? 'bg-tier-0/10 border border-tier-0/50 text-tier-0 hover:bg-tier-0/20'
-                  : `bg-slate-800 border border-zone-${preset.zone}/30 text-slate-300 hover:border-zone-${preset.zone} hover:text-white`
+                  : `bg-grove-bg border border-zone-${preset.zone}/30 text-grove-text-mid hover:border-zone-${preset.zone} hover:text-grove-text`
                 }
               `}
             >
               <span
-                className={`w-2 h-2 rounded-full ${
+                className={`w-2 h-2 ${
                   skilled
                     ? 'bg-tier-0 shadow-[0_0_6px_var(--tier-0)]'
                     : `bg-zone-${preset.zone} shadow-[0_0_4px_var(--zone-${preset.zone})]`
@@ -417,7 +422,7 @@ function PromptTray({ presets, skills, onSelect, disabled }: PromptTrayProps) {
               />
               {skilled && <span>⚡</span>}
               {preset.label}
-              <span className="text-slate-500">
+              <span className="text-grove-text-dim">
                 {skilled ? 'T0' : `T${preset.tier}`}
               </span>
             </button>
