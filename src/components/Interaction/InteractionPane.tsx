@@ -20,10 +20,11 @@
  */
 
 import { useState, useRef, useEffect } from 'react'
-import { useApp, useTutorial, usePendingApproval, usePipeline } from '../../state/context'
+import { useApp, useTutorial, usePendingApproval, usePipeline, useSkillProposal } from '../../state/context'
 import { processInteraction, continueAfterApproval, rejectInteraction } from '../../services'
 import { DiagnosticCard } from '../Diagnostic/DiagnosticCard'
-import type { Interaction, FailureType } from '../../state/types'
+import { SkillProposalCard } from '../Skills'
+import type { Interaction, FailureType, SkillProposal } from '../../state/types'
 
 // Preset prompts for the tray
 const PRESETS = [
@@ -64,6 +65,7 @@ export function InteractionPane() {
   const tutorial = useTutorial()
   const pendingApproval = usePendingApproval()
   const pipeline = usePipeline()
+  const skillProposal = useSkillProposal()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -172,7 +174,7 @@ export function InteractionPane() {
           </div>
         ) : (
           <div className="space-y-4">
-            {state.interactions.map((interaction) => (
+            {state.interactions.map((interaction, index) => (
               <InteractionCard
                 key={interaction.id}
                 interaction={interaction}
@@ -182,6 +184,10 @@ export function InteractionPane() {
                 processing={processing}
                 haltReason={interaction.status === 'halted' ? pipeline.haltReason : null}
                 onReset={() => dispatch({ type: 'RESET_PIPELINE' })}
+                isLatestInteraction={index === state.interactions.length - 1}
+                skillProposal={skillProposal}
+                onApproveSkill={() => dispatch({ type: 'APPROVE_SKILL' })}
+                onRejectSkill={() => dispatch({ type: 'REJECT_SKILL' })}
               />
             ))}
             {/* Scroll anchor with breathing room */}
@@ -272,9 +278,25 @@ interface InteractionCardProps {
   processing: boolean
   haltReason: import('../../state/types').HaltReason | null
   onReset: () => void
+  isLatestInteraction: boolean
+  skillProposal: SkillProposal
+  onApproveSkill: () => void
+  onRejectSkill: () => void
 }
 
-function InteractionCard({ interaction, isSelected, hasSkill, onRunAgain, processing, haltReason, onReset }: InteractionCardProps) {
+function InteractionCard({
+  interaction,
+  isSelected,
+  hasSkill,
+  onRunAgain,
+  processing,
+  haltReason,
+  onReset,
+  isLatestInteraction,
+  skillProposal,
+  onApproveSkill,
+  onRejectSkill,
+}: InteractionCardProps) {
   return (
     <div
       className={`
@@ -365,6 +387,20 @@ function InteractionCard({ interaction, isSelected, hasSkill, onRunAgain, proces
       {/* Inline Diagnostic Card (Digital Jidoka) */}
       {interaction.status === 'halted' && haltReason && (
         <DiagnosticCard reason={haltReason} onReset={onReset} />
+      )}
+
+      {/* Inline Skill Flywheel Proposal (v0.6.0) */}
+      {/* Renders ONLY on the latest interaction that matches the proposal intent */}
+      {skillProposal.active &&
+       skillProposal.intent === interaction.intent &&
+       isLatestInteraction && (
+        <SkillProposalCard
+          intent={skillProposal.intent}
+          pattern={skillProposal.pattern}
+          count={skillProposal.count}
+          onApprove={onApproveSkill}
+          onReject={onRejectSkill}
+        />
       )}
     </div>
   )

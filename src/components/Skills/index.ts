@@ -1,2 +1,2 @@
-export { SkillProposal } from './SkillProposal'
+export { SkillProposalCard } from './SkillProposalCard'
 export { SkillsList } from './SkillsList'

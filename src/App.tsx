@@ -27,7 +27,6 @@ import { InteractionPane } from './components/Interaction'
 import { ConfigEditor } from './components/Config'
 import { TelemetryStream } from './components/Telemetry'
 import { Header } from './components/Header'
-import { SkillProposal } from './components/Skills'
 
 export default function App() {
   const { tutorial } = useAppState()
@@ -51,9 +50,6 @@ export default function App() {
       <footer className="border-t border-grove-border px-6 py-3 text-center text-xs text-grove-text-dim">
         The Grove Autonomaton Pattern • CC BY 4.0 • thegrovefoundation.org
       </footer>
-
-      {/* Skill Proposal Toast */}
-      <SkillProposal />
 
       {/* Tutorial overlay */}
       {tutorial.active && tutorial.currentStep === 0 && (
