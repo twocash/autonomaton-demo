@@ -86,9 +86,9 @@ async function executeAnthropic(
     messages: [{ role: 'user', content: prompt }],
   })
 
-  // Extract text from response
-  const textBlock = response.content.find((block) => block.type === 'text')
-  const text = textBlock && 'text' in textBlock ? textBlock.text : ''
+  // Extract text from response using type predicate for proper narrowing
+  const textBlock = response.content.find((block): block is Anthropic.TextBlock => block.type === 'text')
+  const text = textBlock?.text ?? ''
 
   return {
     text,

@@ -111,7 +111,8 @@ export function parseRoutingConfig(yaml: string): RoutingConfig | { error: strin
       const trimmed = line.trim()
       if (!trimmed || trimmed === 'intents:') continue
 
-      // Intent name (2 spaces indent, ends with :)
+      // Intent name: exactly 2-space indent, word characters only, ends with colon
+      // Example: "  capture_idea:" → captures "capture_idea"
       const intentMatch = line.match(/^  (\w+):$/)
       if (intentMatch) {
         currentIntent = intentMatch[1]
@@ -124,7 +125,8 @@ export function parseRoutingConfig(yaml: string): RoutingConfig | { error: strin
         continue
       }
 
-      // Property (4 spaces indent)
+      // Property: exactly 4-space indent, "key: value" format
+      // Example: "    tier: 2" → captures ["tier", "2"]
       if (currentIntent) {
         const propMatch = line.match(/^    (\w+): (.+)$/)
         if (propMatch) {
@@ -139,6 +141,7 @@ export function parseRoutingConfig(yaml: string): RoutingConfig | { error: strin
               intent.zone = value as 'green' | 'yellow' | 'red'
             }
           } else if (key === 'description') {
+            // Strip surrounding quotes: "hello world" → hello world
             intent.description = value.replace(/^"|"$/g, '')
           }
         }

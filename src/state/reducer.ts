@@ -288,6 +288,9 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       }
 
     case 'COMPLETE_INTERACTION': {
+      // Pipeline processes one interaction at a time, so the most recent is always current.
+      // This LIFO assumption is safe because SUBMIT_INPUT → ... → COMPLETE_INTERACTION
+      // is a synchronous sequence for a single interaction.
       const currentInteraction = state.interactions[state.interactions.length - 1]
       if (!currentInteraction) return state
 

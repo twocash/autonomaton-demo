@@ -339,8 +339,8 @@ function checkJidoka(failureType: FailureType, currentStage: PipelineStage): Hal
 
   if (failureStages[failureType] !== currentStage) return null
 
-  const reasons: Record<FailureType, HaltReason> = {
-    none: null as unknown as HaltReason,
+  // 'none' case is handled by early return above, so exclude it from the Record
+  const reasons: Record<Exclude<FailureType, 'none'>, HaltReason> = {
     api_timeout: {
       stage: 'execution',
       error: 'API Timeout: No response received within 30s',

@@ -19,10 +19,14 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useRoutingConfig, useZonesSchema, useAppDispatch, useAppState, useSkills } from '../../state/context'
-import { serializeRoutingConfig, parseRoutingConfig } from '../../config/routing'
-import { serializeZonesSchema } from '../../config/zones'
-import { serializeModelsConfig, parseModelsConfig } from '../../config/models'
-import { serializeSkills } from '../../config/skills'
+import {
+  serializeRoutingConfig,
+  parseRoutingConfig,
+  serializeZonesSchema,
+  serializeModelsConfig,
+  parseModelsConfig,
+  serializeSkills,
+} from '../../config'
 
 /**
  * Applies syntax highlighting to YAML text
