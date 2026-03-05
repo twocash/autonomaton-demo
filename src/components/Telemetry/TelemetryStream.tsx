@@ -15,11 +15,12 @@
  */
 
 import { useTelemetry, useAppDispatch, useAppState } from '../../state/context'
+import { generateProvenanceHash } from '../../utils/provenance'
 
 export function TelemetryStream() {
   const telemetry = useTelemetry()
   const dispatch = useAppDispatch()
-  const { selectedTelemetryId } = useAppState()
+  const { selectedTelemetryId, modelConfig } = useAppState()
 
   const handleEntryClick = (id: string) => {
     dispatch({ type: 'SELECT_TELEMETRY', id: selectedTelemetryId === id ? null : id })
@@ -70,32 +71,45 @@ export function TelemetryStream() {
           </div>
         ) : (
           <div className="space-y-1">
-            {telemetry.map((entry) => (
-              <div
-                key={entry.id}
-                onClick={() => handleEntryClick(entry.id)}
-                className={`
-                  telemetry-entry cursor-pointer
-                  ${selectedTelemetryId === entry.id ? 'selected' : ''}
-                `}
-              >
-                <span className="text-grove-green font-semibold">{entry.timestamp.slice(11, 19)}</span>
-                <span className="text-grove-text-dim"> │ </span>
-                <span className="text-grove-green/80">{entry.intent}</span>
-                <span className="text-grove-text-dim"> │ </span>
-                <TierBadge tier={entry.tier} />
-                <span className="text-grove-text-dim"> │ </span>
-                <ZoneBadge zone={entry.zone} />
-                <span className="text-grove-text-dim"> │ </span>
-                <span className="text-grove-text-mid">${entry.cost.toFixed(4)}</span>
-                {entry.skillMatch && (
-                  <>
-                    <span className="text-grove-text-dim"> │ </span>
-                    <span className="text-tier-0">cached</span>
-                  </>
-                )}
-              </div>
-            ))}
+            {telemetry.map((entry) => {
+              // Resolve model name from tier (modelConfig uses tier0/tier1/tier2/tier3 keys)
+              const tierKey = `tier${entry.tier}` as 'tier0' | 'tier1' | 'tier2' | 'tier3'
+              const executionModel = entry.tier === 0
+                ? 'local_cache'
+                : modelConfig[tierKey]?.model || 'unknown'
+              const hash = generateProvenanceHash(entry.id, entry.intent, executionModel)
+
+              return (
+                <div
+                  key={entry.id}
+                  onClick={() => handleEntryClick(entry.id)}
+                  className={`
+                    telemetry-entry cursor-pointer
+                    ${selectedTelemetryId === entry.id ? 'selected' : ''}
+                  `}
+                >
+                  <span className="text-grove-green font-semibold">{entry.timestamp.slice(11, 19)}</span>
+                  <span className="text-grove-text-dim"> │ </span>
+                  <span className="text-grove-green/80 min-w-[80px]">{entry.intent}</span>
+                  <span className="text-grove-text-dim"> │ </span>
+                  <TierBadge tier={entry.tier} />
+                  <span className="text-grove-text-dim"> │ </span>
+                  <ZoneBadge zone={entry.zone} />
+                  <span className="text-grove-text-dim"> │ </span>
+                  <span className="text-grove-text-mid/70 min-w-[120px] truncate text-[10px]">{executionModel}</span>
+                  <span className="text-grove-text-dim"> │ </span>
+                  <span className="text-grove-text-mid">${entry.cost.toFixed(4)}</span>
+                  <span className="text-grove-text-dim"> │ </span>
+                  <span className="text-grove-amber/70 hover:text-grove-amber transition-colors">#{hash}</span>
+                  {entry.skillMatch && (
+                    <>
+                      <span className="text-grove-text-dim"> │ </span>
+                      <span className="text-tier-0">cached</span>
+                    </>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

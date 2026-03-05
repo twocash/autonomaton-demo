@@ -97,6 +97,10 @@ export function InteractionPane() {
 
   const handlePreset = async (presetInput: string) => {
     if (processing) return
+    // Auto-wake: switch to BYOK mode when user clicks a preset
+    if (state.mode === 'demo') {
+      dispatch({ type: 'SET_MODE', mode: 'interactive' })
+    }
     setProcessing(true)
     try {
       await processInteraction(presetInput, state, dispatch)
@@ -263,11 +267,25 @@ export function InteractionPane() {
 
       {/* Input Area */}
       <form onSubmit={handleSubmit} className="border-t border-grove-border p-4">
-        <div className="flex gap-2">
+        <div
+          className="flex gap-2"
+          onClick={() => {
+            // Auto-wake: clicking anywhere in the input area switches to BYOK mode
+            if (state.mode === 'demo') {
+              dispatch({ type: 'SET_MODE', mode: 'interactive' })
+            }
+          }}
+        >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={() => {
+              // Auto-wake: any keypress also triggers BYOK mode
+              if (state.mode === 'demo') {
+                dispatch({ type: 'SET_MODE', mode: 'interactive' })
+              }
+            }}
             placeholder={processing ? 'Processing...' : 'Type your request...'}
             disabled={processing || !!pendingApproval}
             className="flex-1 bg-grove-bg border border-grove-border px-4 py-2 text-grove-text placeholder-grove-text-dim focus:outline-none focus:border-grove-amber disabled:opacity-50"

@@ -60,7 +60,7 @@ export function Header() {
             onClick={() => dispatch({ type: 'OPEN_DECK' })}
             className="font-serif text-grove-amber hover:text-grove-amber-bright transition-colors text-sm"
           >
-            [ Architecture Deck ]
+            [ Anatomy of an Autonomaton ]
           </button>
 
           {/* Mode Toggle */}
@@ -76,7 +76,7 @@ export function Header() {
                 }
               `}
             >
-              {mode === 'demo' ? 'Demo' : 'Interactive'}
+              {mode === 'demo' ? 'Demo' : 'BYOK'}
             </button>
           </div>
         </div>
