@@ -1,4 +1,5 @@
 export { classifyIntent, shouldProposeSkill, generatePatternDescription } from './cognitive-router'
 export { processInteraction, continueAfterApproval, rejectInteraction } from './pipeline-orchestrator'
-export { executeCognitiveRequest } from './CognitiveAdapter'
+export { executeCognitiveRequest, streamCognitiveRequest } from './CognitiveAdapter'
 export type { CognitiveResult } from './CognitiveAdapter'
+export { compileArchitecture, FOUNDRY_SYSTEM_PROMPT } from './foundry-compiler'

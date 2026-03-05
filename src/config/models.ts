@@ -78,17 +78,29 @@ tiers:
 `
 }
 
-export function parseModelsConfig(text: string): { modelConfig: AppState['modelConfig'] } | { error: string } {
+export function parseModelsConfig(
+  text: string,
+  currentConfig?: AppState['modelConfig']
+): { modelConfig: AppState['modelConfig'] } | { error: string } {
   try {
     // Simple YAML-like parsing for the models config
     const lines = text.split('\n')
     let currentTier: 1 | 2 | 3 | null = null
-    const config: AppState['modelConfig'] = {
-      tier0: { provider: 'local_memory', apiKey: null, model: 'cached_skill' },
-      tier1: { provider: 'anthropic', apiKey: null, model: 'claude-3-haiku' },
-      tier2: { provider: 'anthropic', apiKey: null, model: 'claude-sonnet-4' },
-      tier3: { provider: 'anthropic', apiKey: null, model: 'claude-opus-4' },
-    }
+
+    // Start with current config to preserve API keys, or use defaults
+    const config: AppState['modelConfig'] = currentConfig
+      ? {
+          tier0: { ...currentConfig.tier0 },
+          tier1: { ...currentConfig.tier1 },
+          tier2: { ...currentConfig.tier2 },
+          tier3: { ...currentConfig.tier3 },
+        }
+      : {
+          tier0: { provider: 'local_memory', apiKey: null, model: 'cached_skill' },
+          tier1: { provider: 'anthropic', apiKey: null, model: 'claude-3-haiku-20240307' },
+          tier2: { provider: 'anthropic', apiKey: null, model: 'claude-sonnet-4-20250514' },
+          tier3: { provider: 'anthropic', apiKey: null, model: 'claude-opus-4-20250514' },
+        }
 
     for (const line of lines) {
       const trimmed = line.trim()
@@ -129,10 +141,11 @@ export function parseModelsConfig(text: string): { modelConfig: AppState['modelC
             config[tierKey].model = value
             break
           case 'api_key':
-            // Don't overwrite existing key with masked value
+            // Only update if user entered a real key (not masked/placeholder)
             if (value !== '••••••••' && value !== '<not set>') {
               config[tierKey].apiKey = value || null
             }
+            // If masked, the existing key is preserved from currentConfig
             break
         }
       }

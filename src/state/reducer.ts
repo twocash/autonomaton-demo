@@ -18,9 +18,9 @@ export const initialState: AppState = {
 
   modelConfig: {
     tier0: { provider: 'local_memory', apiKey: null, model: 'cached_skill' },
-    tier1: { provider: 'anthropic', apiKey: null, model: 'claude-3-haiku' },
-    tier2: { provider: 'anthropic', apiKey: null, model: 'claude-sonnet-4' },
-    tier3: { provider: 'anthropic', apiKey: null, model: 'claude-opus-4' },
+    tier1: { provider: 'anthropic', apiKey: null, model: 'claude-3-haiku-20240307' },
+    tier2: { provider: 'anthropic', apiKey: null, model: 'claude-sonnet-4-20250514' },
+    tier3: { provider: 'anthropic', apiKey: null, model: 'claude-opus-4-20250514' },
   },
 
   routingConfig: defaultRoutingConfig,
@@ -73,6 +73,14 @@ export const initialState: AppState = {
   // Synchronous localStorage check prevents UI flash on first visit
   isDeckOpen: typeof window !== 'undefined' && !localStorage.getItem('grove_hasSeenDeck'),
   activeSlideIndex: 0,
+
+  // Foundry (v0.9.0)
+  foundry: {
+    input: '',
+    isCompiling: false,
+    generatedPRD: '',
+    error: null,
+  },
 }
 
 // =============================================================================
@@ -466,6 +474,62 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     // =========================================================================
     case 'SET_VIEW':
       return { ...state, currentView: action.view }
+
+    // =========================================================================
+    // FOUNDRY (v0.9.0)
+    // =========================================================================
+    case 'SET_FOUNDRY_INPUT':
+      return {
+        ...state,
+        foundry: { ...state.foundry, input: action.input },
+      }
+
+    case 'START_FOUNDRY_COMPILATION':
+      return {
+        ...state,
+        foundry: {
+          ...state.foundry,
+          isCompiling: true,
+          generatedPRD: '',
+          error: null,
+        },
+      }
+
+    case 'APPEND_FOUNDRY_CHUNK':
+      return {
+        ...state,
+        foundry: {
+          ...state.foundry,
+          generatedPRD: state.foundry.generatedPRD + action.chunk,
+        },
+      }
+
+    case 'COMPLETE_FOUNDRY_COMPILATION':
+      return {
+        ...state,
+        foundry: { ...state.foundry, isCompiling: false },
+      }
+
+    case 'FAIL_FOUNDRY_COMPILATION':
+      return {
+        ...state,
+        foundry: {
+          ...state.foundry,
+          isCompiling: false,
+          error: action.error,
+        },
+      }
+
+    case 'CLEAR_FOUNDRY':
+      return {
+        ...state,
+        foundry: {
+          input: '',
+          isCompiling: false,
+          generatedPRD: '',
+          error: null,
+        },
+      }
 
     default:
       return state

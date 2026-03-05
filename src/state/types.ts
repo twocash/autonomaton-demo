@@ -181,6 +181,17 @@ export interface TutorialState {
 }
 
 // =============================================================================
+// FOUNDRY — Architectural compiler (v0.9.0)
+// =============================================================================
+
+export interface FoundryState {
+  input: string
+  isCompiling: boolean
+  generatedPRD: string
+  error: string | null
+}
+
+// =============================================================================
 // FAILURE SIMULATION (Andon Cord)
 // =============================================================================
 
@@ -257,6 +268,9 @@ export interface AppState {
   // Deck overlay (v0.7.1)
   isDeckOpen: boolean
   activeSlideIndex: number
+
+  // Foundry (v0.9.0)
+  foundry: FoundryState
 }
 
 // =============================================================================
@@ -321,3 +335,11 @@ export type AppAction =
 
   // View routing (v0.8.0)
   | { type: 'SET_VIEW'; view: CurrentView }
+
+  // Foundry (v0.9.0)
+  | { type: 'SET_FOUNDRY_INPUT'; input: string }
+  | { type: 'START_FOUNDRY_COMPILATION' }
+  | { type: 'APPEND_FOUNDRY_CHUNK'; chunk: string }
+  | { type: 'COMPLETE_FOUNDRY_COMPILATION' }
+  | { type: 'FAIL_FOUNDRY_COMPILATION'; error: string }
+  | { type: 'CLEAR_FOUNDRY' }

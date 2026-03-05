@@ -143,3 +143,110 @@ async function executeOpenAI(
     tokensOut: response.usage?.completion_tokens,
   }
 }
+
+// =============================================================================
+// STREAMING IMPLEMENTATIONS (v0.9.0 — Foundry)
+// =============================================================================
+
+/**
+ * Stream a cognitive request for real-time display.
+ * Used by the Foundry for live PRD generation.
+ */
+export async function* streamCognitiveRequest(
+  prompt: string,
+  systemPrompt: string,
+  tierConfig: ModelConfig
+): AsyncGenerator<string, void, unknown> {
+  const { provider, model, apiKey } = tierConfig
+
+  if (!apiKey || apiKey.trim() === '') {
+    throw new Error(`Missing API Key for provider: ${provider}. Update models.config.`)
+  }
+
+  switch (provider.toLowerCase()) {
+    case 'anthropic':
+      yield* streamAnthropic(prompt, systemPrompt, model, apiKey)
+      break
+    case 'openai':
+      yield* streamOpenAI(prompt, systemPrompt, model, apiKey)
+      break
+    case 'google':
+      yield* streamGoogle(prompt, systemPrompt, model, apiKey)
+      break
+    default:
+      throw new Error(`Streaming not supported for provider: ${provider}`)
+  }
+}
+
+async function* streamAnthropic(
+  prompt: string,
+  systemPrompt: string,
+  model: string,
+  apiKey: string
+): AsyncGenerator<string, void, unknown> {
+  const client = new Anthropic({
+    apiKey,
+    dangerouslyAllowBrowser: true,
+  })
+
+  const stream = client.messages.stream({
+    model: model || 'claude-sonnet-4-20250514',
+    max_tokens: 4096,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: prompt }],
+  })
+
+  for await (const event of stream) {
+    if (
+      event.type === 'content_block_delta' &&
+      event.delta.type === 'text_delta'
+    ) {
+      yield event.delta.text
+    }
+  }
+}
+
+async function* streamOpenAI(
+  prompt: string,
+  systemPrompt: string,
+  model: string,
+  apiKey: string
+): AsyncGenerator<string, void, unknown> {
+  const client = new OpenAI({
+    apiKey,
+    dangerouslyAllowBrowser: true,
+  })
+
+  const stream = await client.chat.completions.create({
+    model: model || 'gpt-4o',
+    max_tokens: 4096,
+    stream: true,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: prompt },
+    ],
+  })
+
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content
+    if (content) yield content
+  }
+}
+
+async function* streamGoogle(
+  prompt: string,
+  systemPrompt: string,
+  model: string,
+  apiKey: string
+): AsyncGenerator<string, void, unknown> {
+  const genAI = new GoogleGenerativeAI(apiKey)
+  const gemini = genAI.getGenerativeModel({
+    model: model || 'gemini-1.5-pro',
+    systemInstruction: systemPrompt,
+  })
+
+  const result = await gemini.generateContentStream(prompt)
+  for await (const chunk of result.stream) {
+    yield chunk.text()
+  }
+}

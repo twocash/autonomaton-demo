@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(grove-foundation-loop)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\ndocs: initialize Grove Autonomaton Pattern Playground sprint\n\nSprint planning for browser-based demo proving 9 Autonomaton claims:\n- Five-stage pipeline visualization\n- Cognitive router with tier selection\n- Declarative config editing with immediate effect\n- Zone governance \\(Green/Yellow/Red\\)\n- Skill Flywheel with pattern learning\n- Cost ratchet with downward migration\n- Full telemetry audit trail\n- Model independence\n- Digital Jidoka fail-fast\n\nArtifacts: SPEC, ARCHITECTURE, DECISIONS, SPRINTS, EXECUTION_PROMPT\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(git tag:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm install:*)",
+      "Bash(timeout:*)",
+      "Bash(tree:*)",
+      "Bash(npx vite --port 5178)"
+    ]
+  }
+}

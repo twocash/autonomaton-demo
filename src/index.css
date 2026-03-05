@@ -140,6 +140,7 @@
     background: var(--bg-editor);
     min-height: 300px;
     display: grid;
+    position: relative;
   }
 
   /* Syntax-highlighted YAML editor - backdrop layer */
@@ -150,7 +151,8 @@
     white-space: pre-wrap;
     word-break: break-word;
     line-height: 1.5;
-    overflow: hidden;
+    overflow: auto;
+    z-index: 1;
   }
 
   /* Syntax-highlighted YAML editor - input layer */
@@ -167,6 +169,9 @@
     line-height: 1.5;
     border: none;
     min-height: 300px;
+    overflow: auto;
+    z-index: 2;
+    position: relative;
   }
 
   .yaml-editor-container:focus-within {

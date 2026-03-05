@@ -17,7 +17,7 @@
  * Design: Strict geometry (no rounded)
  */
 
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRoutingConfig, useZonesSchema, useAppDispatch, useAppState, useSkills } from '../../state/context'
 import {
   serializeRoutingConfig,
@@ -112,7 +112,8 @@ export function ConfigEditor() {
   }
 
   const handleSaveModels = () => {
-    const result = parseModelsConfig(modelsText)
+    // Pass current config to preserve masked API keys
+    const result = parseModelsConfig(modelsText, state.modelConfig)
     if ('error' in result) {
       setError(result.error)
       return
@@ -290,33 +291,13 @@ interface SyntaxHighlightedEditorProps {
 }
 
 function SyntaxHighlightedEditor({ value, onChange }: SyntaxHighlightedEditorProps) {
-  const highlightedHtml = useMemo(() => highlightYaml(value), [value])
-  const backdropRef = useRef<HTMLDivElement>(null)
-
-  const handleScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
-    if (backdropRef.current) {
-      backdropRef.current.scrollTop = e.currentTarget.scrollTop
-      backdropRef.current.scrollLeft = e.currentTarget.scrollLeft
-    }
-  }
-
+  // Simplified: plain textarea without overlay (v0.9.0 fix)
   return (
-    <div className="yaml-editor-container">
-      {/* Syntax highlighted backdrop */}
-      <div
-        ref={backdropRef}
-        className="yaml-editor-backdrop"
-        dangerouslySetInnerHTML={{ __html: highlightedHtml + '\n' }}
-        aria-hidden="true"
-      />
-      {/* Transparent textarea for editing */}
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onScroll={handleScroll}
-        className="yaml-editor-input"
-        spellCheck={false}
-      />
-    </div>
+    <textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full min-h-[300px] bg-grove-bg border border-grove-border p-4 font-mono text-sm text-grove-text focus:border-grove-amber focus:outline-none resize-none"
+      spellCheck={false}
+    />
   )
 }
