@@ -14,6 +14,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useAppState, useAppDispatch } from '../../state/context'
 import { compileArchitecture } from '../../services/foundry-compiler'
 import { generateBlueprintHTML, downloadBlueprint } from '../../utils/blueprint-generator'
+import { getPipelineSignature } from '../../config/prompts.schema'
 
 export function FoundryPane() {
   const [appName, setAppName] = useState('')
@@ -43,7 +44,13 @@ export function FoundryPane() {
   }
 
   const handleDownload = () => {
-    const html = generateBlueprintHTML(appName, foundry.generatedPRD)
+    const signature = getPipelineSignature()
+    const html = generateBlueprintHTML(
+      appName,
+      foundry.generatedPRD,
+      modelConfig.tier3.model,  // v0.9.3: Model name for provenance
+      signature                  // v0.9.3: Pipeline hash for provenance
+    )
     downloadBlueprint(appName, html)
   }
 

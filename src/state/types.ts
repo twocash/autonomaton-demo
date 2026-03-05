@@ -188,6 +188,7 @@ export interface FoundryState {
   input: string
   isCompiling: boolean
   generatedPRD: string
+  compilerLogs: string[]  // v0.9.3: Preflight telemetry "ticktock"
   error: string | null
 }
 
@@ -339,6 +340,7 @@ export type AppAction =
   // Foundry (v0.9.0)
   | { type: 'SET_FOUNDRY_INPUT'; input: string }
   | { type: 'START_FOUNDRY_COMPILATION' }
+  | { type: 'APPEND_FOUNDRY_LOG'; log: string }  // v0.9.3: Compiler telemetry
   | { type: 'APPEND_FOUNDRY_CHUNK'; chunk: string }
   | { type: 'COMPLETE_FOUNDRY_COMPILATION' }
   | { type: 'FAIL_FOUNDRY_COMPILATION'; error: string }

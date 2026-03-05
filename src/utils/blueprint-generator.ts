@@ -13,7 +13,15 @@
 // HTML MANIFESTO GENERATOR
 // =============================================================================
 
-export function generateBlueprintHTML(appName: string, generatedPRD: string): string {
+/**
+ * v0.9.3: Added modelName and pipelineSignature parameters for compiler provenance.
+ */
+export function generateBlueprintHTML(
+  appName: string,
+  generatedPRD: string,
+  modelName: string,
+  pipelineSignature: string
+): string {
   const timestamp = new Date().toISOString().slice(0, 10)
 
   return `<!DOCTYPE html>
@@ -159,6 +167,22 @@ export function generateBlueprintHTML(appName: string, generatedPRD: string): st
     <h1>Sovereign Blueprint: ${escapeHtml(appName)}</h1>
     <p style="margin-top: 8px; font-size: 13px;">Generated ${timestamp} by The Grove Foundry</p>
   </header>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- COMPILER PROVENANCE — v0.9.3 -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <div style="background: #0f0f0f; border: 1px solid #252525; padding: 16px; margin-bottom: 40px; font-family: 'Fragment Mono', monospace; font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <span style="color: #4CAF72;">COMPILER PROVENANCE VERIFIED</span><br/>
+      <span style="color: #B0A898;">Generated:</span> <span style="color: #E8E2D9;">${new Date().toISOString()}</span><br/>
+      <span style="color: #B0A898;">Model Engine:</span> <span style="color: #E8E2D9;">${escapeHtml(modelName)}</span>
+    </div>
+    <div style="text-align: right;">
+      <span style="color: #B0A898;">Prompt Schema:</span> <span style="color: #E8E2D9;">v1.0</span><br/>
+      <span style="color: #D4621A; font-size: 14px; font-weight: bold;">PIPELINE HASH: #${escapeHtml(pipelineSignature)}</span>
+    </div>
+  </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <!-- I. THE BUSINESS CASE — THE RATCHET & REGULATORY TIMELINE -->

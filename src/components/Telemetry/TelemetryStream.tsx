@@ -20,7 +20,10 @@ import { generateProvenanceHash } from '../../utils/provenance'
 export function TelemetryStream() {
   const telemetry = useTelemetry()
   const dispatch = useAppDispatch()
-  const { selectedTelemetryId, modelConfig } = useAppState()
+  const { selectedTelemetryId, modelConfig, currentView, foundry } = useAppState()
+
+  // v0.9.3: Show compiler logs when in Foundry view and compiling
+  const isFoundryCompiling = currentView === 'foundry' && foundry.compilerLogs.length > 0
 
   const handleEntryClick = (id: string) => {
     dispatch({ type: 'SELECT_TELEMETRY', id: selectedTelemetryId === id ? null : id })
@@ -42,11 +45,15 @@ export function TelemetryStream() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-grove-border/50">
         <div className="flex items-center gap-2">
-          <span className="text-grove-green animate-pulse">●</span>
+          <span className={`${foundry.isCompiling ? 'animate-pulse' : ''} text-grove-green`}>●</span>
           <span className="text-sm font-mono font-medium text-grove-green/80">
-            Telemetry Stream
+            {isFoundryCompiling ? 'Compiler Ledger' : 'Telemetry Stream'}
           </span>
-          {telemetry.length > 0 && (
+          {isFoundryCompiling ? (
+            <span className="text-xs font-mono text-grove-green/60">
+              ({foundry.compilerLogs.length} events)
+            </span>
+          ) : telemetry.length > 0 && (
             <span className="text-xs font-mono text-grove-green/60">
               ({telemetry.length} entries)
             </span>
@@ -54,7 +61,8 @@ export function TelemetryStream() {
         </div>
         <button
           onClick={handleExport}
-          className="text-xs font-mono text-grove-green hover:text-grove-green/80 transition-colors border border-grove-green/30 hover:border-grove-green/60 px-2 py-0.5"
+          disabled={isFoundryCompiling}
+          className="text-xs font-mono text-grove-green hover:text-grove-green/80 transition-colors border border-grove-green/30 hover:border-grove-green/60 px-2 py-0.5 disabled:opacity-50"
         >
           Export Audit Log
         </button>
@@ -62,7 +70,18 @@ export function TelemetryStream() {
 
       {/* Stream */}
       <div className="flex-1 p-2 overflow-y-auto scrollbar-thin font-mono text-xs">
-        {telemetry.length === 0 ? (
+        {/* v0.9.3: Compiler Ledger mode */}
+        {isFoundryCompiling ? (
+          <div className="space-y-1 p-2">
+            {foundry.compilerLogs.map((log, i) => (
+              <div key={i} className="flex gap-3">
+                <span className="text-grove-green">&gt;</span>
+                <span className="text-grove-green/80">{log}</span>
+              </div>
+            ))}
+            {foundry.isCompiling && <span className="text-grove-green animate-pulse">_</span>}
+          </div>
+        ) : telemetry.length === 0 ? (
           <div className="text-grove-green/50 p-2 space-y-1">
             <p><span className="text-grove-green">&gt;</span> Telemetry entries will appear here...</p>
             <p><span className="text-grove-green">&gt;</span> Each interaction generates a structured audit record</p>

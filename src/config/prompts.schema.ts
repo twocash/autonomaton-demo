@@ -6,6 +6,7 @@
  * as a declarative schema.
  *
  * v0.9.2: "The Sovereign Manifesto Payload"
+ * v0.9.3: Added getPipelineSignature() for recursive provenance
  */
 
 export interface PromptBlock {
@@ -69,3 +70,21 @@ Identify 2 specific areas where a junior dev would instinctively hardcode logic 
  */
 export const compileFoundryPrompt = (): string =>
   FoundryPromptSchema.pipeline.map(block => block.content).join('\n\n')
+
+/**
+ * Generate a deterministic signature of the prompt pipeline.
+ * This creates an immutable proof of the instructions used for compilation.
+ *
+ * The signature is: v{version}-{8-char-hex-hash}
+ * Example: v1.0-a3f8b2c1
+ */
+export const getPipelineSignature = (): string => {
+  const payload = JSON.stringify(FoundryPromptSchema)
+  let hash = 0
+  for (let i = 0; i < payload.length; i++) {
+    const char = payload.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  return `v${FoundryPromptSchema.version}-${Math.abs(hash).toString(16).padStart(8, '0')}`
+}

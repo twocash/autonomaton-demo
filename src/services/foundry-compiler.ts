@@ -9,7 +9,7 @@
 
 import type { ModelConfig, AppAction } from '../state/types'
 import { streamCognitiveRequest } from './CognitiveAdapter'
-import { compileFoundryPrompt } from '../config/prompts.schema'
+import { compileFoundryPrompt, getPipelineSignature, FoundryPromptSchema } from '../config/prompts.schema'
 
 // =============================================================================
 // SYSTEM PROMPT — Compiled from Declarative Pipeline
@@ -25,8 +25,12 @@ export const FOUNDRY_SYSTEM_PROMPT = compileFoundryPrompt()
 
 type Dispatch = React.Dispatch<AppAction>
 
+/** Small delay for telemetry ticktock visual effect */
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 /**
  * Stream architecture compilation from Tier 3 provider.
+ * v0.9.3: Includes preflight telemetry "ticktock" before LLM stream.
  * Dispatches chunks to state as they arrive.
  */
 export async function compileArchitecture(
@@ -37,6 +41,29 @@ export async function compileArchitecture(
   dispatch({ type: 'START_FOUNDRY_COMPILATION' })
 
   try {
+    // =========================================================================
+    // PREFLIGHT TELEMETRY — The Compiler Ledger "Ticktock"
+    // =========================================================================
+    const signature = getPipelineSignature()
+
+    dispatch({ type: 'APPEND_FOUNDRY_LOG', log: '[SYSTEM] Initializing Foundry Compiler engine...' })
+    await delay(300)
+
+    dispatch({ type: 'APPEND_FOUNDRY_LOG', log: `[CONFIG] Loading declarative prompt schema (v${FoundryPromptSchema.version})...` })
+    await delay(300)
+
+    dispatch({ type: 'APPEND_FOUNDRY_LOG', log: `[PROVENANCE] Pipeline signature: ${signature}` })
+    await delay(300)
+
+    dispatch({ type: 'APPEND_FOUNDRY_LOG', log: `[NETWORK] Routing to Tier 3 Apex (${tierConfig.model})...` })
+    await delay(400)
+
+    dispatch({ type: 'APPEND_FOUNDRY_LOG', log: '[STREAM] Connection established. Receiving architecture payload...' })
+    await delay(200)
+
+    // =========================================================================
+    // STREAM LLM RESPONSE
+    // =========================================================================
     for await (const chunk of streamCognitiveRequest(
       appDescription,
       FOUNDRY_SYSTEM_PROMPT,

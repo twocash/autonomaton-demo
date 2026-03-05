@@ -79,6 +79,7 @@ export const initialState: AppState = {
     input: '',
     isCompiling: false,
     generatedPRD: '',
+    compilerLogs: [],  // v0.9.3: Preflight telemetry
     error: null,
   },
 }
@@ -491,7 +492,17 @@ export function appReducer(state: AppState, action: AppAction): AppState {
           ...state.foundry,
           isCompiling: true,
           generatedPRD: '',
+          compilerLogs: [],  // v0.9.3: Clear previous logs
           error: null,
+        },
+      }
+
+    case 'APPEND_FOUNDRY_LOG':
+      return {
+        ...state,
+        foundry: {
+          ...state.foundry,
+          compilerLogs: [...state.foundry.compilerLogs, action.log],
         },
       }
 
@@ -527,6 +538,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
           input: '',
           isCompiling: false,
           generatedPRD: '',
+          compilerLogs: [],  // v0.9.3: Clear logs on reset
           error: null,
         },
       }
