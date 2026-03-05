@@ -144,16 +144,17 @@ export function FoundryPane() {
         {/* Export CTA */}
         {isComplete && (
           <div className="mt-8 p-6 border border-grove-amber bg-grove-amber/5 text-center">
-            <h3 className="font-serif text-2xl text-grove-amber mb-2">Architecture Compiled</h3>
-            <p className="font-mono text-xs text-grove-text-dim mb-6">
-              Drop this artifact into Cursor, Windsurf, or Claude Code. It contains your PRD,
-              the pattern philosophy, and strict agentic guardrails.
+            <h3 className="font-serif text-2xl text-grove-amber mb-2">Sovereign Manifesto Ready</h3>
+            <p className="font-mono text-xs text-grove-text-dim mb-6 max-w-lg mx-auto leading-relaxed">
+              Distribute this HTML file to your engineering team, legal reviewers, and drop it
+              directly into Cursor or Claude Code. It serves as your business case, regulatory
+              shield, and strict agentic coding instructions.
             </p>
             <button
               onClick={handleDownload}
               className="bg-grove-amber hover:bg-grove-amber-bright text-grove-bg font-mono text-sm uppercase tracking-widest px-8 py-4 transition-colors w-full"
             >
-              Download Sovereign Blueprint (.html)
+              Download Sovereign Manifesto (.html)
             </button>
             <button
               onClick={() => dispatch({ type: 'CLEAR_FOUNDRY' })}

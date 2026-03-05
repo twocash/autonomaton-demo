@@ -1,44 +1,23 @@
 /**
- * Foundry Compiler — The Sovereign Blueprint Engine (v0.9.0)
+ * Foundry Compiler — The Sovereign Blueprint Engine (v0.9.2)
  *
  * Uses Tier 3 streaming to compile app descriptions into strict
  * Grove Autonomaton PRDs in real-time.
+ *
+ * v0.9.2: Now uses declarative prompt pipeline from prompts.schema.ts
  */
 
 import type { ModelConfig, AppAction } from '../state/types'
 import { streamCognitiveRequest } from './CognitiveAdapter'
+import { compileFoundryPrompt } from '../config/prompts.schema'
 
 // =============================================================================
-// SYSTEM PROMPT — The Architect's Directive
+// SYSTEM PROMPT — Compiled from Declarative Pipeline
 // =============================================================================
 
-export const FOUNDRY_SYSTEM_PROMPT = `
-You are a Principal Systems Architect enforcing the Grove Autonomaton Pattern.
-The user will provide a rough app concept. You will write a strict, declarative Product Requirements Document (PRD).
-
-MANDATORY OUTPUT STRUCTURE (Use Markdown):
-
-# Architecture Spec: [App Name]
-
-## 1. The Invariant Pipeline
-Map the core user loop to the 5 stages: Telemetry -> Recognition -> Compilation -> Approval -> Execution.
-
-## 2. Cognitive Routing (Intents)
-List the core intents. Assign each to a Tier:
-- Tier 0: Cached/Free
-- Tier 1: Cheap/Local
-- Tier 2: Premium Cloud
-- Tier 3: Apex/Agentic
-
-## 3. Sovereignty Guardrails
-Classify operations into:
-- Green (Autonomous): Safe to execute.
-- Yellow (Supervised): Propose and wait for human approval.
-- Red (Human-Only): Surface info only.
-
-## 4. Anti-Patterns & Hardcoding Warnings
-Identify 2 specific areas where a developer might instinctively hardcode logic for this app, and explicitly explain how it MUST be moved to declarative configuration (routing.config or zones.schema) instead.
-`
+// The prompt is now composed from src/config/prompts.schema.ts
+// This separates prompt engineering from execution logic.
+export const FOUNDRY_SYSTEM_PROMPT = compileFoundryPrompt()
 
 // =============================================================================
 // COMPILATION ORCHESTRATOR
