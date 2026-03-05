@@ -15,6 +15,7 @@ import { useAppState, useAppDispatch } from '../../state/context'
 import { compileArchitecture } from '../../services/foundry-compiler'
 import { generateBlueprintHTML, downloadBlueprint } from '../../utils/blueprint-generator'
 import { getPipelineSignature } from '../../config/prompts.schema'
+import { getRandomHeroPrompt } from '../../config/hero-prompts'
 
 export function FoundryPane() {
   const [appName, setAppName] = useState('')
@@ -23,11 +24,21 @@ export function FoundryPane() {
 
   // Auto-scroll ref
   const streamEndRef = useRef<HTMLDivElement>(null)
+  // Textarea ref for auto-focus after hero prompt injection
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Auto-scroll when PRD updates or compilation completes
   useEffect(() => {
     streamEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [foundry.generatedPRD, foundry.isCompiling])
+
+  // Inject a random hero prompt and focus the textarea
+  const injectRandomHeroPrompt = () => {
+    const hero = getRandomHeroPrompt()
+    dispatch({ type: 'SET_FOUNDRY_INPUT', input: hero.prompt })
+    // Focus textarea after state update
+    setTimeout(() => textareaRef.current?.focus(), 0)
+  }
 
   const handleCompile = async () => {
     if (!foundry.input.trim() || foundry.isCompiling) return
@@ -79,20 +90,30 @@ export function FoundryPane() {
         {/* Input Area */}
         {!isComplete && (
           <div className="space-y-4">
-            {/* UI Teaser: Mode Selector */}
-            <div className="flex items-center gap-4 font-mono text-xs">
-              <span className="text-grove-amber">
-                [◉] Scaffold New Project
-              </span>
-              <span className="text-grove-text-dim flex items-center gap-1">
-                [○] Refactor Codebase
-                <span className="text-[9px] border border-grove-border px-1 py-0.5 text-grove-text-dim">
-                  v2.0
+            {/* UI Teaser: Mode Selector + Hero Prompt Loader */}
+            <div className="flex items-center justify-between font-mono text-xs">
+              <div className="flex items-center gap-4">
+                <span className="text-grove-amber">
+                  [◉] Scaffold New Project
                 </span>
-              </span>
+                <span className="text-grove-text-dim flex items-center gap-1">
+                  [○] Refactor Codebase
+                  <span className="text-[9px] border border-grove-border px-1 py-0.5 text-grove-text-dim">
+                    v2.0
+                  </span>
+                </span>
+              </div>
+              <button
+                onClick={injectRandomHeroPrompt}
+                disabled={foundry.isCompiling}
+                className="text-[10px] text-grove-amber border border-grove-amber/30 px-2 py-1 rounded-sm hover:bg-grove-amber/10 transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                <span className="text-sm">🎲</span> Load Architectural Prompt
+              </button>
             </div>
 
             <textarea
+              ref={textareaRef}
               value={foundry.input}
               onChange={(e) => dispatch({ type: 'SET_FOUNDRY_INPUT', input: e.target.value })}
               placeholder="e.g., A local agent that reads my Notion inbox, categorizes tasks by urgency, and autonomously drafts status reports..."
