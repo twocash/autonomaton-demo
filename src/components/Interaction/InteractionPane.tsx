@@ -519,46 +519,56 @@ function PromptTray({ presets, skills, onSelect, disabled, simulateFailure, onFa
 
   return (
     <div className="border-t border-grove-border/50 px-4 py-2 bg-grove-bg/50 mb-4">
-      <div className="flex items-center justify-between gap-4">
-        {/* v0.9.5: Simulation Control Pad Label — FIXED, does not scroll */}
-        <div className="font-mono text-[10px] text-grove-text-dim uppercase tracking-widest border-r border-grove-border pr-3 flex-shrink-0">
-          Simulate Intent
-        </div>
-        {/* Preset Pills — scrollable */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-thin pb-1 flex-1">
-          {presets.map((preset) => {
-            const skilled = hasSkill(preset.intent)
-            return (
-              <button
-                key={preset.intent}
-                onClick={() => onSelect(preset.input)}
-                disabled={disabled}
-                className={`
-                  flex items-center gap-1.5 px-2 py-1 text-xs font-mono whitespace-nowrap
-                  transition-all disabled:opacity-50
-                  ${skilled
-                    ? 'bg-tier-0/10 border border-tier-0/50 text-tier-0 hover:bg-tier-0/20'
-                    : `bg-grove-bg border border-zone-${preset.zone}/30 text-grove-text-mid hover:border-zone-${preset.zone} hover:text-grove-text`
-                  }
-                `}
-              >
-                <span
-                  className={`w-1.5 h-1.5 ${
-                    skilled
-                      ? 'bg-tier-0'
-                      : `bg-zone-${preset.zone}`
-                  }`}
-                />
-                {preset.label}
-                <span className="text-grove-text-dim">
-                  {skilled ? 'T0' : `T${preset.tier}`}
-                </span>
-              </button>
-            )
-          })}
+      <div className="flex items-start justify-between gap-4">
+        {/* LEFT COLUMN: Label + Buttons + Hint (grouped) */}
+        <div className="flex flex-col flex-1 min-w-0">
+          {/* Row: Label + Scrollable Buttons */}
+          <div className="flex items-center gap-3">
+            <div className="font-mono text-[10px] text-grove-text-dim uppercase tracking-widest border-r border-grove-border pr-3 flex-shrink-0">
+              Simulate Intent
+            </div>
+            <div className="flex gap-2 overflow-x-auto scrollbar-thin pb-1 flex-1">
+              {presets.map((preset) => {
+                const skilled = hasSkill(preset.intent)
+                return (
+                  <button
+                    key={preset.intent}
+                    onClick={() => onSelect(preset.input)}
+                    disabled={disabled}
+                    className={`
+                      flex items-center gap-1.5 px-2 py-1 text-xs font-mono whitespace-nowrap
+                      transition-all disabled:opacity-50
+                      ${skilled
+                        ? 'bg-tier-0/10 border border-tier-0/50 text-tier-0 hover:bg-tier-0/20'
+                        : `bg-grove-bg border border-zone-${preset.zone}/30 text-grove-text-mid hover:border-zone-${preset.zone} hover:text-grove-text`
+                      }
+                    `}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 ${
+                        skilled
+                          ? 'bg-tier-0'
+                          : `bg-zone-${preset.zone}`
+                      }`}
+                    />
+                    {preset.label}
+                    <span className="text-grove-text-dim">
+                      {skilled ? 'T0' : `T${preset.tier}`}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+          {/* Flywheel Hint — LEFT-aligned under buttons */}
+          <div className="text-left mt-1">
+            <span className="font-mono text-[9px] text-grove-amber/70 italic">
+              Hint: Execute the same intent 3 times to trigger the Skill Flywheel.
+            </span>
+          </div>
         </div>
 
-        {/* Andon Dropdown — Far Right */}
+        {/* RIGHT COLUMN: Jidoka Dropdown (isolated) */}
         <select
           value={simulateFailure}
           onChange={(e) => onFailureChange(e.target.value as FailureType)}
@@ -575,12 +585,6 @@ function PromptTray({ presets, skills, onSelect, disabled, simulateFailure, onFa
           <option value="low_confidence">Jidoka: Low Confidence</option>
           <option value="hallucination_detected">Jidoka: Hallucination</option>
         </select>
-      </div>
-      {/* v0.9.5: Flywheel Hint — separate row below buttons */}
-      <div className="w-full text-right mt-1">
-        <span className="font-mono text-[9px] text-grove-amber/70 italic">
-          Hint: Execute the same intent 3 times to trigger the Skill Flywheel.
-        </span>
       </div>
     </div>
   )

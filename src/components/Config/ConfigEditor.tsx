@@ -140,6 +140,13 @@ export function ConfigEditor() {
         </div>
       )}
 
+      {/* Architectural Header */}
+      <div className="border-b border-grove-border px-4 py-2 bg-grove-bg2">
+        <span className="font-mono text-[10px] text-grove-text-dim uppercase tracking-widest flex items-center gap-2">
+          <span className="text-grove-amber">■</span> Declarative Configuration
+        </span>
+      </div>
+
       {/* Tabs */}
       <div className="flex border-b border-grove-border overflow-x-auto">
         <TabButton
@@ -168,7 +175,7 @@ export function ConfigEditor() {
 
       {/* Editor */}
       <div className={`
-        flex-1 p-4 overflow-y-auto
+        flex-1 p-4 flex flex-col min-h-0
         ${!hasEdited && isEditable ? 'animate-pulse-border' : ''}
       `}>
         {activeTab === 'routing' && (
@@ -199,7 +206,7 @@ export function ConfigEditor() {
           ) : isEditable ? (
             <span className="text-grove-green">✓ Valid</span>
           ) : (
-            <span className="text-grove-text-dim">Read-only</span>
+            <span className="text-grove-text-dim">Read-only in Playground Mode</span>
           )}
         </div>
         {activeTab === 'routing' && (
@@ -220,12 +227,6 @@ export function ConfigEditor() {
         )}
       </div>
 
-      {/* First-edit hint */}
-      {!hasEdited && isEditable && (
-        <div className="absolute top-12 right-4 bg-grove-amber text-white text-xs px-2 py-1 shadow-lg animate-bounce">
-          Edit me — changes apply instantly!
-        </div>
-      )}
     </div>
   )
 }
@@ -275,7 +276,7 @@ function SyntaxHighlightedYaml({ text }: SyntaxHighlightedYamlProps) {
 
   return (
     <div
-      className="yaml-viewer w-full min-h-[300px] overflow-auto"
+      className="yaml-viewer w-full h-full overflow-auto"
       dangerouslySetInnerHTML={{ __html: highlightedHtml }}
     />
   )
@@ -296,7 +297,7 @@ function SyntaxHighlightedEditor({ value, onChange }: SyntaxHighlightedEditorPro
     <textarea
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full min-h-[300px] bg-grove-bg border border-grove-border p-4 font-mono text-sm text-grove-text focus:border-grove-amber focus:outline-none resize-none"
+      className="w-full h-full bg-grove-bg border border-grove-border p-4 font-mono text-sm text-grove-text focus:border-grove-amber focus:outline-none resize-none"
       spellCheck={false}
     />
   )
