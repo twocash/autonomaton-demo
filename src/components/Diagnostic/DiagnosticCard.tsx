@@ -5,6 +5,9 @@
  * When the pipeline halts, this card renders inline with the
  * interaction that caused the halt — not in a separate location.
  *
+ * v0.9.4: "Transparent Provenance" — Config-driven Andon Cord
+ * Shows explicit guidance to edit config files when pipeline halts.
+ *
  * Design: Industrial manifesto styling
  * - Sharp corners (no rounded)
  * - Deep dark red background (#1a0a0a)
@@ -48,6 +51,23 @@ export function DiagnosticCard({ reason, onReset }: DiagnosticCardProps) {
           <span className="text-grove-amber">{reason.proposedFix}</span>
         </div>
       </div>
+
+      {/* v0.9.4: Config-Driven Andon Cord — Explicit config file guidance */}
+      {reason.stage === 'recognition' && (
+        <div className="mt-4 p-4 border-l-4 border-grove-amber bg-grove-bg3">
+          <div className="font-mono text-xs text-grove-amber tracking-widest uppercase mb-2">
+            Config-Driven Fix Available
+          </div>
+          <p className="font-mono text-sm text-grove-text mb-3">
+            The cognitive router cannot proceed because the intent is not mapped to any Tier.
+          </p>
+          <div className="bg-grove-bg2 border border-grove-border p-3 font-mono text-xs text-grove-text-dim">
+            <span className="text-grove-green">Fix:</span> Open{' '}
+            <span className="text-grove-text">routing.config.ts</span> in the right pane
+            and add this intent to the desired compute tier array to resume execution.
+          </div>
+        </div>
+      )}
 
       {/* Action Button */}
       <button

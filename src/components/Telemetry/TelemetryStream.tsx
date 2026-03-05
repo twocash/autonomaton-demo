@@ -9,6 +9,8 @@
  * - Click entry → highlights corresponding interaction
  * - Export audit log as JSON
  * - Terminal-style green tint for visual distinction from chat UI
+ * - v0.9.4: X-Ray tooltips showing config rules that drove routing
+ * - v0.9.4: "Copy as Jest Test" button for determinism proof
  *
  * Typography: Fragment Mono for all content
  * Design: Strict geometry (no rounded)
@@ -16,6 +18,7 @@
 
 import { useTelemetry, useAppDispatch, useAppState } from '../../state/context'
 import { generateProvenanceHash } from '../../utils/provenance'
+import type { TelemetryEntry } from '../../state/types'
 
 export function TelemetryStream() {
   const telemetry = useTelemetry()
@@ -38,6 +41,19 @@ export function TelemetryStream() {
     a.download = `autonomaton-audit-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  // v0.9.4: Copy telemetry entry as Jest test
+  const copyAsTest = (entry: TelemetryEntry, executionModel: string, hash: string) => {
+    const testCode = `// Generated from Telemetry Hash #${hash}
+test('Intent "${entry.intent}" routes to T${entry.tier} and triggers ${entry.zone} zone', async () => {
+  const result = await pipeline.execute('${entry.intent}');
+  expect(result.tier).toBe(${entry.tier});
+  expect(result.zone).toBe('${entry.zone}');
+  expect(result.model).toBe('${executionModel}');
+});`
+    navigator.clipboard.writeText(testCode)
+    // Brief visual feedback via dispatch (optional enhancement)
   }
 
   return (
@@ -111,15 +127,53 @@ export function TelemetryStream() {
                   <span className="text-grove-text-dim"> │ </span>
                   <span className="text-grove-green/80 min-w-[80px]">{entry.intent}</span>
                   <span className="text-grove-text-dim"> │ </span>
-                  <TierBadge tier={entry.tier} />
+                  {/* v0.9.4: X-Ray Tooltip for Tier */}
+                  <div className="relative group/tier inline-flex items-center">
+                    <TierBadge tier={entry.tier} />
+                    <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tier:block z-50 w-64 bg-grove-bg3 border border-grove-border p-3 shadow-2xl">
+                      <div className="font-mono text-[9px] text-grove-text-dim uppercase mb-2 border-b border-grove-border/50 pb-1">
+                        routing.config.ts
+                      </div>
+                      <pre className="font-mono text-[10px] text-grove-text whitespace-pre-wrap">
+{`"${entry.intent}": {
+  "tier": ${entry.tier},
+  "provider": "${executionModel}"
+}`}
+                      </pre>
+                    </div>
+                  </div>
                   <span className="text-grove-text-dim"> │ </span>
-                  <ZoneBadge zone={entry.zone} />
+                  {/* v0.9.4: X-Ray Tooltip for Zone */}
+                  <div className="relative group/zone inline-flex items-center">
+                    <ZoneBadge zone={entry.zone} />
+                    <div className="absolute bottom-full left-0 mb-2 hidden group-hover/zone:block z-50 w-64 bg-grove-bg3 border border-grove-border p-3 shadow-2xl">
+                      <div className="font-mono text-[9px] text-grove-text-dim uppercase mb-2 border-b border-grove-border/50 pb-1">
+                        zones.schema.ts
+                      </div>
+                      <pre className="font-mono text-[10px] text-grove-text whitespace-pre-wrap">
+{`"${entry.zone}": {
+  "meaning": "${entry.zone === 'green' ? 'Autonomous Routine' : entry.zone === 'yellow' ? 'Supervised Proposals' : 'Human-Only'}",
+  "intent": "${entry.intent}"
+}`}
+                      </pre>
+                    </div>
+                  </div>
                   <span className="text-grove-text-dim"> │ </span>
                   <span className="text-grove-text-mid/70 min-w-[120px] truncate text-[10px]">{executionModel}</span>
                   <span className="text-grove-text-dim"> │ </span>
                   <span className="text-grove-text-mid">${entry.cost.toFixed(4)}</span>
                   <span className="text-grove-text-dim"> │ </span>
-                  <span className="text-grove-amber/70 hover:text-grove-amber transition-colors">#{hash}</span>
+                  {/* v0.9.4: Hash with Copy as Test button */}
+                  <div className="inline-flex items-center gap-2">
+                    <span className="text-grove-amber/70 hover:text-grove-amber transition-colors">#{hash}</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); copyAsTest(entry, executionModel, hash); }}
+                      className="opacity-0 group-hover:opacity-100 font-mono text-[9px] border border-grove-border hover:border-grove-text px-1.5 py-0.5 text-grove-text-dim hover:text-grove-text transition-all"
+                      title="Copy as Jest Test"
+                    >
+                      [TEST]
+                    </button>
+                  </div>
                   {entry.skillMatch && (
                     <>
                       <span className="text-grove-text-dim"> │ </span>

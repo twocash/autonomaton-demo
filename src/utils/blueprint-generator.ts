@@ -1,5 +1,5 @@
 /**
- * Blueprint Generator — The Sovereign Manifesto (v0.9.2)
+ * Blueprint Generator — The Sovereign Manifesto (v0.9.4)
  *
  * Wraps generated PRD in a beautifully styled HTML document that serves as:
  * - Business case for C-suite and legal
@@ -7,6 +7,8 @@
  * - Executable context file for AI coding assistants
  *
  * v0.9.2: "The Sovereign Manifesto Payload"
+ * v0.9.3: Added modelName and pipelineSignature parameters
+ * v0.9.4: "Transparent Provenance" — Git-linked hash and schema links
  */
 
 // =============================================================================
@@ -179,8 +181,13 @@ export function generateBlueprintHTML(
       <span style="color: #B0A898;">Model Engine:</span> <span style="color: #E8E2D9;">${escapeHtml(modelName)}</span>
     </div>
     <div style="text-align: right;">
-      <span style="color: #B0A898;">Prompt Schema:</span> <span style="color: #E8E2D9;">v1.0</span><br/>
-      <span style="color: #D4621A; font-size: 14px; font-weight: bold;">PIPELINE HASH: #${escapeHtml(pipelineSignature)}</span>
+      <span style="color: #B0A898;">Prompt Schema:</span>
+      <a href="https://github.com/twocash/grove-autonomaton-example/blob/main/src/config/prompts.schema.ts" target="_blank" style="color: #4CAF72; text-decoration: none; border-bottom: 1px dotted #4CAF72;">
+        v1.0 (View Source)
+      </a><br/>
+      <span style="color: #D4621A; font-size: 14px; font-weight: bold;">
+        PIPELINE HASH: <a href="https://github.com/twocash/grove-autonomaton-example" target="_blank" style="color: #D4621A; text-decoration: none;">#${escapeHtml(pipelineSignature)}</a>
+      </span>
     </div>
   </div>
 
