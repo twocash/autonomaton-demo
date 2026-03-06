@@ -302,6 +302,7 @@ Some projects have additional binding requirements beyond the base Foundation Lo
 4. Its anti-patterns section defines architectural violations
 5. Its agentic coding directives are binding
 6. Its audit ledger schema defines the provenance format
+7. **Its declarations map 1:1 to your test suite.** Every zone entry is a governance test. Every routing rule is a classification assertion. Every anti-pattern is a regression test. The Manifesto doesn't describe what to test — it IS the test spec, expressed as config.
 
 Every SPEC.md must include:
 
@@ -313,6 +314,7 @@ Every SPEC.md must include:
 **Routing tiers:** [Tier mapping summary from contract]
 **Provenance format:** [Audit ledger schema from contract]
 **Anti-patterns:** [Key violations to avoid from contract]
+**Test derivation:** [Number of zone tests + routing tests + anti-pattern regression tests derived from contract]
 ```
 
 ---
@@ -368,8 +370,10 @@ Create executable plan: epics, stories, commit sequence, build gates.
 **MANDATORY:** Every epic MUST include:
 - Which pipeline stage(s) the work serves
 - Zone classification for new capabilities
-- Test tasks (pipeline compliance, zone governance, provenance integrity)
+- Test tasks derived from the governing contract (Manifesto or CLAUDE.md)
 - Build gate commands
+
+**When a Sovereign Manifesto is present:** derive the test scaffold directly from its declarations. Every zone entry, routing rule, escalation trigger, and anti-pattern should have a corresponding test. The contract IS the test spec.
 
 ```markdown
 ## Epic N: {Feature}
@@ -378,10 +382,12 @@ Create executable plan: epics, stories, commit sequence, build gates.
 **Pipeline Stage:** [Which of the 5 stages]
 **Zone:** [Green/Yellow/Red]
 **Task:** ...
-**Tests:**
+**Tests derived from contract:**
+- Zone: [zone declaration] → test that governance behaves correctly
+- Routing: [routing rule] → test that intent classifies to correct tier
+- Anti-pattern: [anti-pattern] → regression test ensuring config-driven behavior
+- Provenance: [audit entry] → test that trace is produced with correct schema
 - Pipeline: Does the interaction traverse all 5 stages?
-- Zone: Does governance behave correctly?
-- Provenance: Does the audit trail capture this action?
 
 ### Build Gate
 ```bash
@@ -533,6 +539,94 @@ Code Change → Tests Run → Results → Unified View
                               Pass ✅ Ship / Fail 🚫 Block
 ```
 
+### The Manifesto IS the Test Spec
+
+The Sovereign Manifesto's declarations map 1:1 to unit tests. This is not a metaphor — it's a structural property. Every declaration in the zone schema, routing config, and anti-patterns section is a testable assertion waiting to be written.
+
+**Zone schema → governance tests:**
+
+```yaml
+# From the Manifesto's zone schema:
+zones:
+  green:
+    - parse_known_format
+    - write_structured_json
+  yellow:
+    - add_parsing_rule
+    - modify_field_mappings
+  red:
+    - delete_source_data
+    - modify_tier_routing
+```
+
+```typescript
+// Each line IS a test case:
+test('parse_known_format executes autonomously (Green)', async () => {
+  const result = await pipeline.execute('parse_known_format');
+  expect(result.zone).toBe('green');
+  expect(result.status).toBe('completed'); // No approval gate
+});
+
+test('add_parsing_rule requires human approval (Yellow)', async () => {
+  const result = await pipeline.execute('add_parsing_rule');
+  expect(result.zone).toBe('yellow');
+  expect(result.status).toBe('pending_approval');
+});
+
+test('delete_source_data is blocked (Red)', async () => {
+  const result = await pipeline.execute('delete_source_data');
+  expect(result.zone).toBe('red');
+  expect(result.status).toBe('info_only');
+});
+```
+
+**Routing config → classification tests:**
+
+```yaml
+# From the Manifesto's routing config:
+routing:
+  tier_0:
+    - regex_pattern_match
+  tier_1:
+    - fuzzy_format_detect
+  tier_3:
+    - unknown_format_analysis
+escalation_triggers:
+  - confidence_below: 0.7
+```
+
+```typescript
+test('regex_pattern_match routes to Tier 0 (free, local)', async () => {
+  const decision = classifyIntent('parse invoice with known format', config);
+  expect(decision.tier).toBe(0);
+  expect(decision.cost).toBe(0);
+});
+
+test('confidence below 0.7 escalates to higher tier', async () => {
+  const decision = classifyIntent('ambiguous input', config);
+  expect(decision.confidence).toBeLessThan(0.7);
+  expect(decision.tier).toBeGreaterThanOrEqual(2);
+});
+```
+
+**Anti-patterns → regression tests:**
+
+```typescript
+// From the Manifesto: "MUST be declarative, not hardcoded"
+test('format detection uses config, not hardcoded conditionals', () => {
+  // If this test requires code changes to add a new format,
+  // the architecture is violated. Adding a format should be
+  // a config-only operation.
+  const formats = loadFormats('formats.config');
+  expect(formats).toContainKey('invoice');
+  // Adding 'receipt' should require only a config change:
+  formats.receipt = { indicators: ['Receipt'], parser: 'receipt_v1' };
+  expect(classifyFormat('Receipt #123', formats)).toBe('receipt');
+});
+```
+
+**The implication:** When a Sovereign Manifesto is present, the Foundation Loop should generate a test scaffold as part of Build 6 (Story Breakdown). Every zone declaration, routing rule, escalation trigger, and anti-pattern becomes a named test. The test suite is derived from the contract, not invented by the developer.
+
 **Pattern-native tests for Autonomaton systems:**
 
 - **Pipeline compliance:** Does every interaction traverse all 5 stages?
@@ -541,6 +635,7 @@ Code Change → Tests Run → Results → Unified View
 - **Skill Flywheel:** Does pattern repetition trigger skill proposals?
 - **Telemetry integrity:** Does every interaction produce a structured audit entry?
 - **Provenance:** Can an auditor reconstruct any decision from telemetry alone? Are provenance hashes deterministic?
+- **Manifesto compliance:** Does every declaration in the contract have a corresponding passing test?
 
 **Test philosophy: Behavior over implementation.**
 

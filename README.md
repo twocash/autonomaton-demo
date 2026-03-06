@@ -94,6 +94,8 @@ The Foundation Loop detects its own context. When it finds a `CLAUDE.md` in the 
 
 **The Evolution Harvest** ensures the software you build is the software that improves itself. During every coding session, the Foundation Loop watches for three categories of opportunity: Jidoka (the system could detect this failure automatically), Kaizen (this manual fix could be automated), and Flywheel (this repeated pattern could become a cached skill). Evolution candidates get logged to the DEVLOG and triaged at session boundaries. The engineering methodology embodies the pattern it governs — if the process doesn't surface self-improvement opportunities during development, the resulting software won't surface them during operation.
 
+There's a property of this approach that nobody designed. It emerged from the architectural commitment to declaring behavior in config instead of code. Because zone boundaries, routing rules, escalation triggers, and anti-patterns all live in declarative schemas, those schemas are simultaneously the governance contract *and* the test specification. Every zone entry is a governance test. Every routing rule is a classification assertion. Every anti-pattern is a regression test. The Sovereign Manifesto doesn't describe what to test — it *is* the test suite, expressed as architecture. The test coverage comes free with the contract. That's what happens when transparency is structural rather than bolted on.
+
 ### Toolkit source files
 
 | Tool | Location | Purpose |
