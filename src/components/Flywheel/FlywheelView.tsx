@@ -10,7 +10,7 @@
  * 3. Tier Distribution — Reused from Dashboard, shows the ratchet effect
  */
 
-import { useSkills, usePatternCounts, useMetrics, useRoutingConfig, useAppDispatch } from '../../state/context'
+import { useSkills, usePatternCounts, useMetrics, useRoutingConfig } from '../../state/context'
 import { TierDistribution } from '../Dashboard/TierDistribution'
 
 /**
@@ -111,7 +111,6 @@ export function FlywheelView() {
   const patternCounts = usePatternCounts()
   const metrics = useMetrics()
   const routingConfig = useRoutingConfig()
-  const dispatch = useAppDispatch()
 
   // Get threshold from config (default 5)
   const threshold = routingConfig.skillPromotion?.afterNApprovals ?? 5

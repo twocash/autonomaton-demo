@@ -112,14 +112,17 @@ export function ConfigPanel({ subjects, onRemoveSubject }: ConfigPanelProps) {
           />
         )}
         {activeTab === 'thresholds' && (
-          <ThresholdsTab zonesSchema={zonesSchema} />
+          <ThresholdsTab
+            zonesSchema={zonesSchema}
+            onNavigateToRouting={() => setActiveTab('routing')}
+          />
         )}
         {activeTab === 'routing' && (
-          <div className="p-4">
+          <div className="p-4 h-full flex flex-col">
             <p className="font-mono text-xs text-grove-text-dim mb-4">
               Intent routing rules. Edit and apply to change tier routing.
             </p>
-            <div className="h-96">
+            <div className="flex-1 min-h-[500px]">
               <ConfigEditor />
             </div>
           </div>
@@ -280,9 +283,10 @@ interface ThresholdsTabProps {
       flywheel_eligible: boolean
     }>
   }
+  onNavigateToRouting?: () => void
 }
 
-function ThresholdsTab({ zonesSchema }: ThresholdsTabProps) {
+function ThresholdsTab({ zonesSchema, onNavigateToRouting }: ThresholdsTabProps) {
   return (
     <div className="p-6 space-y-6">
       <p className="font-mono text-xs text-grove-text-dim">
@@ -368,7 +372,13 @@ function ThresholdsTab({ zonesSchema }: ThresholdsTabProps) {
       </div>
 
       <p className="font-mono text-[10px] text-grove-text-dim text-center">
-        Zone thresholds are derived from zones.schema.ts
+        Zone thresholds are derived from zones.schema.ts in{' '}
+        <button
+          onClick={onNavigateToRouting}
+          className="text-grove-amber hover:text-grove-amber-bright underline"
+        >
+          Routing
+        </button>
       </p>
     </div>
   )

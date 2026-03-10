@@ -132,7 +132,7 @@ export function ConfigEditor() {
   const isEditable = activeTab === 'routing' || activeTab === 'models'
 
   return (
-    <div className="w-96 flex flex-col border-l border-grove-border bg-grove-bg2 relative">
+    <div className="w-full h-full flex flex-col border border-grove-border bg-grove-bg2 relative">
       {/* Config Ripple Animation */}
       {configRipple && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
