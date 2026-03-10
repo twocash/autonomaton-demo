@@ -15,7 +15,6 @@ import { useAppState, useAppDispatch } from '../../state/context'
 import { compileArchitecture } from '../../services/foundry-compiler'
 import { generateBlueprintHTML, downloadBlueprint } from '../../utils/blueprint-generator'
 import { getPipelineSignature } from '../../config/prompts.schema'
-import { getRandomHeroPrompt } from '../../config/hero-prompts'
 import { getSignalWatchTemplate, getBlankTemplate } from '../../config/foundry-template'
 
 export function FoundryPane() {
@@ -32,14 +31,6 @@ export function FoundryPane() {
   useEffect(() => {
     streamEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [foundry.generatedPRD, foundry.isCompiling])
-
-  // Inject a random hero prompt and focus the textarea
-  const injectRandomHeroPrompt = () => {
-    const hero = getRandomHeroPrompt()
-    dispatch({ type: 'SET_FOUNDRY_INPUT', input: hero.prompt })
-    // Focus textarea after state update
-    setTimeout(() => textareaRef.current?.focus(), 0)
-  }
 
   // Load Signal Watch example template
   const loadSignalWatchTemplate = () => {
@@ -132,13 +123,6 @@ export function FoundryPane() {
                   className="text-[10px] text-grove-text-dim border border-grove-border px-2 py-1 rounded-sm hover:bg-grove-amber/5 transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
                   <span className="text-sm">📝</span> Blank Template
-                </button>
-                <button
-                  onClick={injectRandomHeroPrompt}
-                  disabled={foundry.isCompiling}
-                  className="text-[10px] text-grove-amber border border-grove-amber/30 px-2 py-1 rounded-sm hover:bg-grove-amber/10 transition-colors flex items-center gap-2 disabled:opacity-50"
-                >
-                  <span className="text-sm">🎲</span> Load Architectural Prompt
                 </button>
               </div>
             </div>
@@ -233,8 +217,46 @@ export function FoundryPane() {
 // HELPERS
 // =============================================================================
 
+const STOP_WORDS = new Set([
+  'the', 'a', 'an', 'i', 'want', 'to', 'build', 'create', 'make', 'my', 'for',
+  'that', 'which', 'is', 'it', 'this', 'and', 'or', 'of', 'in', 'on', 'with',
+  'as', 'by', 'be', 'are', 'was', 'were', 'been', 'being', 'have', 'has', 'had',
+  'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must',
+  'shall', 'can', 'need', 'dare', 'ought', 'used', 'autonomaton', 'foundry'
+])
+
 function extractAppName(input: string): string {
-  // Extract app name from common patterns
+  // Strategy 1: Template Section 1 extraction
+  if (input.includes('## Section 1:')) {
+    const section1Match = input.match(/## Section 1:[^\n]*\n([\s\S]*?)(?=\n---|\n## Section 2:|$)/)
+    if (section1Match) {
+      const section1Content = section1Match[1]
+      // Find the first substantive line (skip blanks, >, **, |, ```)
+      const lines = section1Content.split('\n')
+      for (const line of lines) {
+        const trimmed = line.trim()
+        if (!trimmed) continue
+        if (trimmed.startsWith('>')) continue
+        if (trimmed.startsWith('**')) continue
+        if (trimmed.startsWith('|')) continue
+        if (trimmed.startsWith('```')) continue
+        if (trimmed.startsWith('[')) continue
+        // Found a substantive line - extract meaningful words
+        const words = trimmed
+          .replace(/[.,;:!?()[\]{}'"]/g, ' ')
+          .split(/\s+/)
+          .filter(w => w.length > 2 && !STOP_WORDS.has(w.toLowerCase()))
+          .slice(0, 5)
+        if (words.length >= 2) {
+          return words
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+            .join(' ')
+        }
+      }
+    }
+  }
+
+  // Strategy 2: Freeform "build a..." patterns (existing behavior)
   const patterns = [
     /(?:build|create|make)\s+(?:a|an)\s+(.+?)(?:\s+that|\s+which|\.)/i,
     /^(.+?)\s+(?:app|application|tool|system)/i,
@@ -243,5 +265,19 @@ function extractAppName(input: string): string {
     const match = input.match(pattern)
     if (match) return match[1].trim()
   }
-  return ''
+
+  // Strategy 3: Slug from first meaningful words
+  const words = input
+    .replace(/[#*`>\[\](){}|.,;:!?'"]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !STOP_WORDS.has(w.toLowerCase()))
+    .slice(0, 4)
+  if (words.length >= 2) {
+    return words
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ')
+  }
+
+  // Strategy 4: Absolute fallback
+  return 'New Autonomaton'
 }

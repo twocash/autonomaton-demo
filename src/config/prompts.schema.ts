@@ -59,7 +59,46 @@ Provide a sample 1-line telemetry hash log proving how this app will track model
 \`timestamp | intent | tier | zone | model | cost | #hash\`
 
 ## 5. Anti-Patterns
-Identify 2 specific areas where a junior dev would instinctively hardcode logic for this app, and explain how it MUST be moved to config.`
+Identify 2 specific areas where a junior dev would instinctively hardcode logic for this app, and explain how it MUST be moved to config.
+
+If the user input includes enrichment sections from a Requirements Template (Sections 5-9), also generate these additional sections AFTER the first 5:
+
+## 6. UI Blueprint
+Map the views from the input to pipeline stages and zones. Include layout structure and interaction patterns. If no views section provided, skip entirely.
+
+## 7. Voice Configuration
+Output voice presets as declarative YAML config. Each preset: tone rules, format constraints, sample output. If no voice section provided, skip entirely.
+
+## 8. Seed Data Specification
+Define initial entities, demo content, and first-run experience. If no seed data provided, skip entirely.
+
+## 9. Knowledge Manifest
+List knowledge files and their analytical roles. Format as file manifest with descriptions. If no knowledge section provided, skip entirely.
+
+## 10. Theme Tokens
+Output theme config: mood, accent color, typography, data density. If no theme section provided, skip entirely.
+
+## 11. Build It
+
+This is a Sovereign Manifesto — a complete architectural contract for a working autonomaton.
+
+To build it:
+
+1. Open Claude Code (or Cursor, Windsurf, or any agentic IDE)
+2. Drop this HTML file into the project directory
+3. Prompt: "Read the Sovereign Manifesto and build Phase 1. Use the zones, routing, and pipeline specs exactly as written."
+4. Review what it builds. Approve or redirect.
+5. Repeat for Phases 2-4.
+
+The build plan derives from the 9 Autonomaton claims:
+- Phase 1: Structural Skeleton (Pipeline, Zones, Routing, Telemetry)
+- Phase 2: Intelligence Layer (Cognitive Router, Model Abstraction, Jidoka)
+- Phase 3: Self-Improvement Loop (Skill Flywheel, The Ratchet)
+- Phase 4: Recipe Polish (Views, Theme, Seed Data, Voice, Knowledge)
+
+Each phase has a checkpoint: self-audit against that phase's claims before proceeding.
+
+Only generate sections 6-11 if the user input contains structured template sections. For freeform (non-template) input, generate ONLY sections 1-5 as before.`
     },
     {
       id: "template_recognition",
