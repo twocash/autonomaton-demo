@@ -58,28 +58,33 @@ export function Header() {
         {/* RIGHT: API Key */}
         <div className="flex items-center gap-3">
           {isEditing ? (
-            <>
-              <input
-                type="password"
-                value={tempKey}
-                onChange={(e) => setTempKey(e.target.value)}
-                placeholder="sk-ant-api03-..."
-                className="w-64 px-2 py-1 text-sm font-mono bg-grove-bg border border-grove-border text-grove-text placeholder-grove-text-dim focus:outline-none focus:border-grove-amber"
-                autoFocus
-              />
-              <button
-                onClick={handleSave}
-                className="px-2 py-1 text-sm font-mono text-grove-amber hover:text-grove-amber-bright"
-              >
-                Save
-              </button>
-              <button
-                onClick={handleCancel}
-                className="px-2 py-1 text-sm font-mono text-grove-text-dim hover:text-grove-text"
-              >
-                Cancel
-              </button>
-            </>
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-3">
+                <input
+                  type="password"
+                  value={tempKey}
+                  onChange={(e) => setTempKey(e.target.value)}
+                  placeholder="sk-ant-api03-..."
+                  className="w-64 px-2 py-1 text-sm font-mono bg-grove-bg border border-grove-border text-grove-text placeholder-grove-text-dim focus:outline-none focus:border-grove-amber"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSave}
+                  className="px-2 py-1 text-sm font-mono text-grove-amber hover:text-grove-amber-bright"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="px-2 py-1 text-sm font-mono text-grove-text-dim hover:text-grove-text"
+                >
+                  Cancel
+                </button>
+              </div>
+              <span className="text-xs text-grove-text-dim">
+                Stored locally in browser. Sent only to Anthropic API.
+              </span>
+            </div>
           ) : (
             <>
               <span className="text-sm text-grove-text-dim">API Key:</span>

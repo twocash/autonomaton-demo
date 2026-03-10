@@ -124,3 +124,7 @@ export function usePendingApproval() {
 export function useSimulateFailure() {
   return useAppState().simulateFailure
 }
+
+export function usePatternCounts() {
+  return useAppState().patternCounts
+}

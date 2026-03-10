@@ -47,7 +47,7 @@ export function RedZoneTakeover({
               Red Zone
             </span>
             <h1 className="font-serif text-2xl text-grove-text">
-              Strategic Decision Required
+              High-Value Update — Needs Attention
             </h1>
           </div>
           <button
@@ -82,6 +82,51 @@ export function RedZoneTakeover({
             <p className="text-lg text-grove-text leading-relaxed">{stripCitations(briefing.summary)}</p>
           </section>
 
+          {/* Proposed Score Adjustments — always render when present, independent of research */}
+          {briefing.pendingAdjustments && briefing.pendingAdjustments.length > 0 && (
+            <section className="mb-8">
+              <h3 className="font-mono text-xs text-grove-text-dim uppercase tracking-wider mb-4">
+                Proposed Score Adjustments
+              </h3>
+              <div className="space-y-4">
+                {briefing.pendingAdjustments.map((adj) => {
+                  const deltaDisplay = adj.delta > 0
+                    ? `+${(adj.delta * 100).toFixed(1)}%`
+                    : `${(adj.delta * 100).toFixed(1)}%`
+
+                  return (
+                    <div key={adj.id} className="p-4 bg-grove-bg2 border border-grove-border">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="font-serif text-lg text-grove-text">{adj.subjectName}</span>
+                          <span className="font-mono text-xl font-bold text-zone-red">{deltaDisplay}</span>
+                        </div>
+                        <span className="text-sm text-grove-text-dim font-mono">
+                          Confidence: {(adj.confidence * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                      <p className="text-grove-text-dim mb-4">{stripCitations(adj.reason)}</p>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => onApprove?.(adj.id)}
+                          className="px-4 py-2 bg-zone-green text-white font-mono hover:bg-zone-green/80 transition-colors"
+                        >
+                          Approve Adjustment
+                        </button>
+                        <button
+                          onClick={() => onReject?.(adj.id)}
+                          className="px-4 py-2 border border-grove-border text-grove-text-dim font-mono hover:bg-grove-bg3 transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+
           {/* Research Analysis */}
           {briefing.research && (
             <section className="mb-8">
@@ -106,57 +151,6 @@ export function RedZoneTakeover({
                       </li>
                     ))}
                   </ul>
-                </div>
-              )}
-
-              {/* Proposed Score Adjustments — positioned between Key Findings and Sources for intuitive UX */}
-              {briefing.pendingAdjustments && briefing.pendingAdjustments.length > 0 && (
-                <div className="mb-6">
-                  <h4 className="font-mono text-xs text-grove-text-dim uppercase tracking-wider mb-3">
-                    Proposed Score Adjustments
-                  </h4>
-                  <div className="space-y-4">
-                    {briefing.pendingAdjustments.map((adj) => {
-                      const deltaDisplay = adj.delta > 0
-                        ? `+${(adj.delta * 100).toFixed(1)}%`
-                        : `${(adj.delta * 100).toFixed(1)}%`
-
-                      return (
-                        <div key={adj.id} className="p-4 bg-grove-bg2 border border-grove-border">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <span className="font-serif text-lg text-grove-text">{adj.subjectName}</span>
-                              <span className="font-mono text-xl font-bold text-zone-red">{deltaDisplay}</span>
-                            </div>
-                            <span className="text-sm text-grove-text-dim font-mono">
-                              Confidence: {(adj.confidence * 100).toFixed(0)}%
-                            </span>
-                          </div>
-                          <p className="text-grove-text-dim mb-4">{stripCitations(adj.reason)}</p>
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => {
-                                onApprove?.(adj.id)
-                                onClose()
-                              }}
-                              className="px-4 py-2 bg-zone-green text-white font-mono hover:bg-zone-green/80 transition-colors"
-                            >
-                              Approve Adjustment
-                            </button>
-                            <button
-                              onClick={() => {
-                                onReject?.(adj.id)
-                                onClose()
-                              }}
-                              className="px-4 py-2 border border-grove-border text-grove-text-dim font-mono hover:bg-grove-bg3 transition-colors"
-                            >
-                              Reject
-                            </button>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
                 </div>
               )}
 
@@ -264,7 +258,7 @@ export function RedZoneTakeover({
       <footer className="border-t border-zone-red p-4 bg-zone-red/10">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <p className="text-sm text-grove-text-dim">
-            This decision cannot be automated. You are the human in the loop.
+            High-confidence research surfaced for your review.
           </p>
           <button
             onClick={onClose}

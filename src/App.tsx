@@ -27,6 +27,8 @@ import { CommandBar } from './components/CommandBar'
 import { NavBar } from './components/Navigation'
 import { DashboardView } from './components/Dashboard'
 import { ConfigPanel } from './components/Config'
+import { FlywheelView } from './components/Flywheel'
+import { CostEvaporation } from './components/CostEvaporation'
 import { useAppDispatch, useAppState } from './state/context'
 import type { CurrentView } from './state/types'
 import { executeCognitiveRequest, executeResearchRequest, type ResearchResult } from './services/CognitiveAdapter'
@@ -93,6 +95,30 @@ export default function App() {
   const [pendingIndustry, setPendingIndustry] = useState<string | null>(null)
   const [selectedBriefing, setSelectedBriefing] = useState<Briefing | null>(null)
   const [selectedSubject, setSelectedSubject] = useState<WatchlistSubject | null>(null)
+
+  // Cost evaporation notification state
+  const [costEvaporation, setCostEvaporation] = useState<{
+    savings: number
+    skillName: string
+  } | null>(null)
+  const [prevSkillCount, setPrevSkillCount] = useState(appState.skills.length)
+
+  // Detect when a new skill is added (the "ratchet" moment)
+  useEffect(() => {
+    if (appState.skills.length > prevSkillCount) {
+      // A new skill was just approved
+      const newSkill = appState.skills[appState.skills.length - 1]
+      if (newSkill) {
+        // Calculate estimated future savings per use
+        const estimatedSavings = 0.01 // Tier 2 cost that will be saved
+        setCostEvaporation({
+          savings: estimatedSavings,
+          skillName: newSkill.intentMatch,
+        })
+      }
+    }
+    setPrevSkillCount(appState.skills.length)
+  }, [appState.skills.length, prevSkillCount])
 
   // Persist to localStorage on change
   useEffect(() => {
@@ -1005,6 +1031,62 @@ export default function App() {
     dispatch({ type: 'SET_VIEW', view })
   }
 
+  // CommandBar submit handler (extracted for reuse)
+  const handleCommandBarSubmit = (input: string) => {
+    // Phase 1: Domain setup
+    if (domainSetupPhase === 'industry') {
+      setPendingIndustry(input)
+      setDomainSetupPhase('tracking')
+    } else if (domainSetupPhase === 'tracking' && pendingIndustry) {
+      handleConfigureDomain(pendingIndustry, input)
+      setDomainSetupPhase('awaiting_approval')
+      dispatch({ type: 'SET_VIEW', view: 'briefings' })
+    } else if (domainSetupPhase === 'awaiting_approval') {
+      // User must approve domain config before continuing
+    }
+    // Phase 2: Subject training
+    else if (isTrainingMode && input.toLowerCase().trim() === 'done') {
+      if (subjects.length === 0) return
+      handleCompleteTraining()
+    } else if (isTrainingMode) {
+      const lowerInput = input.toLowerCase()
+      const briefTriggers = ['brief me on', 'brief me about', 'what about', 'update on', 'news on', 'tell me about']
+      const isBriefRequest = briefTriggers.some(t => lowerInput.includes(t))
+      const matchesExistingSubject = subjects.some(s =>
+        s.keywords.some(kw => lowerInput.includes(kw.toLowerCase())) ||
+        lowerInput.includes(s.name.toLowerCase())
+      )
+      if (isBriefRequest && matchesExistingSubject) {
+        handleScan(input)
+      } else {
+        handleAddSubject(input)
+      }
+    }
+    // Phase 3: Operational
+    else {
+      handleScan(input)
+    }
+  }
+
+  // CommandBar placeholder (extracted for reuse)
+  const getCommandBarPlaceholder = () => {
+    if (domainSetupPhase === 'industry') {
+      return 'What industry or domain are you monitoring? (e.g., AI/ML, Healthcare, Fintech)'
+    }
+    if (domainSetupPhase === 'tracking') {
+      return `Tracking ${pendingIndustry}. What signals matter? (e.g., funding, launches, pricing, partnerships...)`
+    }
+    if (domainSetupPhase === 'awaiting_approval') {
+      return '↑ Review and approve domain configuration above to continue'
+    }
+    if (isTrainingMode) {
+      return subjects.length === 0
+        ? `${domainConfig?.domain.name || 'Domain'}: Add your first competitor`
+        : `Added ${subjects.length} subject${subjects.length > 1 ? 's' : ''}. Add more, or type "done" to start monitoring`
+    }
+    return 'Brief me on... (e.g., "Anthropic this week", "OpenAI pricing changes")'
+  }
+
   // Render view content based on currentView
   const renderViewContent = () => {
     switch (appState.currentView) {
@@ -1062,17 +1144,25 @@ export default function App() {
               </div>
             </div>
 
-            {/* CENTER: Briefing Inbox (2/3 of remaining space) */}
-            <div className="flex-[2] min-w-0 border-r border-grove-border">
-              <BriefingInbox
-                briefings={briefings}
-                onApprove={handleApprove}
-                onReject={handleReject}
-                onApproveSubject={handleApproveSubject}
-                onRejectSubject={handleRejectSubject}
-                onApproveDomainConfig={handleApproveDomainConfig}
-                onRejectDomainConfig={handleRejectDomainConfig}
-                onDrillDown={handleDrillDown}
+            {/* CENTER: Briefing Inbox + CommandBar (2/3 of remaining space) */}
+            <div className="flex-[2] min-w-0 border-r border-grove-border flex flex-col">
+              <div className="flex-1 min-h-0">
+                <BriefingInbox
+                  briefings={briefings}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                  onApproveSubject={handleApproveSubject}
+                  onRejectSubject={handleRejectSubject}
+                  onApproveDomainConfig={handleApproveDomainConfig}
+                  onRejectDomainConfig={handleRejectDomainConfig}
+                  onDrillDown={handleDrillDown}
+                />
+              </div>
+              {/* CommandBar inside briefing column */}
+              <CommandBar
+                onSubmit={handleCommandBarSubmit}
+                isProcessing={isProcessing}
+                placeholder={getCommandBarPlaceholder()}
               />
             </div>
 
@@ -1109,17 +1199,7 @@ export default function App() {
         )
 
       case 'flywheel':
-        return (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center p-8">
-              <div className="text-4xl mb-4">⟳</div>
-              <h2 className="font-mono text-xl text-grove-text mb-2">Flywheel View</h2>
-              <p className="text-sm text-grove-text-dim font-mono">
-                Coming in Checkpoint 3
-              </p>
-            </div>
-          </div>
-        )
+        return <FlywheelView />
 
       default:
         return null
@@ -1137,69 +1217,25 @@ export default function App() {
         {renderViewContent()}
       </main>
 
-      {/* Command Bar - styled prominently above telemetry */}
-      <CommandBar
-        onSubmit={(input) => {
-          // Phase 1: Domain setup
-          if (domainSetupPhase === 'industry') {
-            setPendingIndustry(input)
-            setDomainSetupPhase('tracking')
-          } else if (domainSetupPhase === 'tracking' && pendingIndustry) {
-            handleConfigureDomain(pendingIndustry, input)
-            // Move to awaiting approval phase - user must approve domain config before training
-            setDomainSetupPhase('awaiting_approval')
-            // Switch to Briefings view to show the approval card
-            dispatch({ type: 'SET_VIEW', view: 'briefings' })
-          } else if (domainSetupPhase === 'awaiting_approval') {
-            // User must approve domain config before continuing - do nothing
-            // The briefings view shows the approval card
-          }
-          // Phase 2: Subject training
-          else if (isTrainingMode && input.toLowerCase().trim() === 'done') {
-            if (subjects.length === 0) {
-              // Can't complete with empty watchlist
-              return
-            }
-            handleCompleteTraining()
-          } else if (isTrainingMode) {
-            // Smart routing: if asking for a briefing on an EXISTING subject, do scan instead
-            const lowerInput = input.toLowerCase()
-            const briefTriggers = ['brief me on', 'brief me about', 'what about', 'update on', 'news on', 'tell me about']
-            const isBriefRequest = briefTriggers.some(t => lowerInput.includes(t))
-            const matchesExistingSubject = subjects.some(s =>
-              s.keywords.some(kw => lowerInput.includes(kw.toLowerCase())) ||
-              lowerInput.includes(s.name.toLowerCase())
-            )
-
-            if (isBriefRequest && matchesExistingSubject) {
-              // User is asking about existing subject - do scan, not add_subject
-              handleScan(input)
-            } else {
-              handleAddSubject(input)
-            }
-          }
-          // Phase 3: Operational
-          else {
-            handleScan(input)
-          }
-        }}
-        isProcessing={isProcessing}
-        placeholder={
-          domainSetupPhase === 'industry'
-            ? 'What industry or domain are you monitoring? (e.g., AI/ML, Healthcare, Fintech)'
-            : domainSetupPhase === 'tracking'
-            ? `Tracking ${pendingIndustry}. What signals matter? (e.g., funding, launches, pricing, partnerships...)`
-            : domainSetupPhase === 'awaiting_approval'
-            ? '↑ Review and approve domain configuration above to continue'
-            : isTrainingMode
-            ? subjects.length === 0
-              ? `${domainConfig?.domain.name || 'Domain'}: Add your first competitor`
-              : `Added ${subjects.length} subject${subjects.length > 1 ? 's' : ''}. Add more, or type "done" to start monitoring`
-            : 'Brief me on... (e.g., "Anthropic this week", "OpenAI pricing changes")'
-        }
-      />
+      {/* Command Bar - only show globally when NOT on briefings view (briefings has it inline) */}
+      {appState.currentView !== 'briefings' && (
+        <CommandBar
+          onSubmit={handleCommandBarSubmit}
+          isProcessing={isProcessing}
+          placeholder={getCommandBarPlaceholder()}
+        />
+      )}
 
       <TelemetryStream />
+
+      {/* Cost Evaporation Notification - subtle "ratchet" feel */}
+      {costEvaporation && (
+        <CostEvaporation
+          savings={costEvaporation.savings}
+          skillName={costEvaporation.skillName}
+          onComplete={() => setCostEvaporation(null)}
+        />
+      )}
 
       {/* Footer */}
       <footer className="border-t border-grove-border px-6 py-2 text-center text-xs text-grove-text-dim font-mono">

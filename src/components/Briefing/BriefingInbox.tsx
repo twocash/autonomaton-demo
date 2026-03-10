@@ -45,6 +45,20 @@ export function BriefingInbox({
     scrollEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [briefings.length])
 
+  // Sync redTakeover with updated briefing data (so approve/reject reflects immediately)
+  useEffect(() => {
+    if (redTakeover) {
+      const updated = briefings.find(b => b.id === redTakeover.id)
+      if (updated) {
+        // Update with fresh data
+        setRedTakeover(updated)
+      } else {
+        // Briefing was removed, close modal
+        setRedTakeover(null)
+      }
+    }
+  }, [briefings, redTakeover?.id])
+
   // Count by zone
   const pendingSubjects = briefings.filter(b => b.pendingSubject).length
   const stats = {
@@ -82,7 +96,7 @@ export function BriefingInbox({
               )}
               {stats.red > 0 && (
                 <span className="text-zone-red animate-pulse">
-                  {stats.red} require decision
+                  {stats.red} high-value
                 </span>
               )}
             </div>
@@ -107,47 +121,46 @@ export function BriefingInbox({
         </div>
 
         {/* Briefing List */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin">
-          {/* Skill Flywheel Proposal — Shows when pattern threshold reached */}
-          {skillProposal.active && skillProposal.intent && (
-            <SkillProposalCard
-              intent={skillProposal.intent}
-              pattern={skillProposal.pattern}
-              count={skillProposal.count}
-              onApprove={() => dispatch({ type: 'APPROVE_SKILL' })}
-              onReject={() => dispatch({ type: 'REJECT_SKILL' })}
-            />
-          )}
+        <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+          <div className="max-w-[65%] mx-auto space-y-4">
+            {/* Skill Flywheel Proposal — Shows when pattern threshold reached */}
+            {skillProposal.active && skillProposal.intent && (
+              <SkillProposalCard
+                intent={skillProposal.intent}
+                pattern={skillProposal.pattern}
+                count={skillProposal.count}
+                onApprove={() => dispatch({ type: 'APPROVE_SKILL' })}
+                onReject={() => dispatch({ type: 'REJECT_SKILL' })}
+              />
+            )}
 
-          {briefings.length === 0 ? (
-            <div className="text-center py-12 text-grove-text-dim">
-              <p className="font-serif text-lg mb-2">No briefings yet</p>
-              <p className="text-sm">Run an ad-hoc scan or wait for the next scheduled cycle</p>
-            </div>
-          ) : (
-            // Sort: RED first, then YELLOW, then GREEN
-            [...briefings]
-              .sort((a, b) => {
-                const zoneOrder = { red: 0, yellow: 1, green: 2 }
-                return zoneOrder[a.zone] - zoneOrder[b.zone]
-              })
-              .map((briefing) => (
-                <BriefingEntry
-                  key={briefing.id}
-                  briefing={briefing}
-                  onApprove={onApprove}
-                  onReject={onReject}
-                  onApproveSubject={onApproveSubject}
-                  onRejectSubject={onRejectSubject}
-                  onApproveDomainConfig={onApproveDomainConfig}
-                  onRejectDomainConfig={onRejectDomainConfig}
-                  onDrillDown={onDrillDown}
-                  onRedTakeover={handleRedTakeover}
-                />
-              ))
-          )}
-          {/* Scroll anchor for auto-scroll on new briefings */}
-          <div ref={scrollEndRef} className="h-4 flex-shrink-0" />
+            {briefings.length === 0 ? (
+              <div className="text-center py-12 text-grove-text-dim">
+                <p className="font-serif text-lg mb-2">No briefings yet</p>
+                <p className="text-sm">Run an ad-hoc scan or wait for the next scheduled cycle</p>
+              </div>
+            ) : (
+              // Chronological order: oldest first, newest at bottom (chat convention)
+              [...briefings]
+                .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+                .map((briefing) => (
+                  <BriefingEntry
+                    key={briefing.id}
+                    briefing={briefing}
+                    onApprove={onApprove}
+                    onReject={onReject}
+                    onApproveSubject={onApproveSubject}
+                    onRejectSubject={onRejectSubject}
+                    onApproveDomainConfig={onApproveDomainConfig}
+                    onRejectDomainConfig={onRejectDomainConfig}
+                    onDrillDown={onDrillDown}
+                    onRedTakeover={handleRedTakeover}
+                  />
+                ))
+            )}
+            {/* Scroll anchor for auto-scroll on new briefings */}
+            <div ref={scrollEndRef} className="h-4 flex-shrink-0" />
+          </div>
         </div>
 
         {/* Footer */}
