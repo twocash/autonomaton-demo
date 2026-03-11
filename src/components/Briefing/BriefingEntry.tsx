@@ -64,7 +64,7 @@ export function BriefingEntry({
               Red Zone
             </span>
             <span className="text-zone-red font-mono text-sm animate-pulse">
-              Human Decision Required
+              Strategic Review Required
             </span>
           </div>
           <span className="text-xs text-grove-text-dim font-mono">

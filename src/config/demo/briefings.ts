@@ -59,6 +59,43 @@ export const demoBriefings: Briefing[] = [
         rationale: 'Early signals of switching intent will inform retention strategy',
       },
     ],
+    research: {
+      analysis: 'Multiple credible sources confirm GPT-5 announcement with significant capability claims. OpenAI positioning this as a generational leap, though independent verification is pending. Market reaction has been substantial.',
+      keyFindings: [
+        'GPT-5 reportedly achieves 10x improvement on GPQA, MATH, and HumanEval benchmarks',
+        'Enterprise pricing at $0.03/1K tokens undercuts current Claude Opus pricing by 40%',
+        'Sam Altman describes GPT-5 as "the first truly useful AI" in keynote',
+        'Microsoft Azure integration confirmed for day-one availability',
+      ],
+      sources: [
+        {
+          url: 'https://techcrunch.com/2026/03/09/openai-announces-gpt-5-launch',
+          title: 'OpenAI Announces GPT-5 with Reported 10x Capability Improvements',
+          citedText: 'OpenAI unveiled GPT-5 today, claiming breakthrough performance across all major benchmarks...',
+          pageAge: '2 hours ago',
+        },
+        {
+          url: 'https://www.reuters.com/technology/openai-gpt5-enterprise-pricing',
+          title: 'OpenAI Sets Aggressive Enterprise Pricing for GPT-5 Launch',
+          citedText: 'The new pricing structure positions GPT-5 competitively against Anthropic Claude...',
+          pageAge: '3 hours ago',
+        },
+        {
+          url: 'https://openai.com/blog/gpt-5-announcement',
+          title: 'Introducing GPT-5 | OpenAI',
+          citedText: 'Today we announce GPT-5, our most capable model yet...',
+          pageAge: '4 hours ago',
+        },
+        {
+          url: 'https://www.bloomberg.com/news/openai-gpt5-market-reaction',
+          title: 'OpenAI GPT-5 Announcement Sends Ripples Through AI Industry',
+          citedText: 'Analysts are reassessing competitive dynamics in the AI foundation model market...',
+          pageAge: '1 hour ago',
+        },
+      ],
+      searchCount: 3,
+      templateHash: 'demo-001',
+    },
     pendingAdjustments: [
       {
         id: 'adj-001',

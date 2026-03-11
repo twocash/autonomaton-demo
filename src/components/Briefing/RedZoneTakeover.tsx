@@ -47,7 +47,7 @@ export function RedZoneTakeover({
               Red Zone
             </span>
             <h1 className="font-serif text-2xl text-grove-text">
-              High-Value Update — Needs Attention
+              Strategic Analysis — Action Required
             </h1>
           </div>
           <button
