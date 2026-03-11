@@ -120,24 +120,31 @@ export function Header() {
               </span>
             </div>
           ) : (
-            <>
-              <span className="text-sm text-grove-text-dim">API Key:</span>
-              {apiKey ? (
-                <span className="font-mono text-sm text-grove-text">
-                  {maskKey(apiKey)}
-                </span>
-              ) : (
-                <span className="font-mono text-sm text-zone-yellow">
-                  Not configured
+            <div className="flex flex-col items-end gap-0.5">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-grove-text-dim">Anthropic API Key:</span>
+                {apiKey ? (
+                  <span className="font-mono text-sm text-grove-text">
+                    {maskKey(apiKey)}
+                  </span>
+                ) : (
+                  <span className="font-mono text-sm text-zone-yellow">
+                    Required for live research
+                  </span>
+                )}
+                <button
+                  onClick={handleStartEdit}
+                  className="px-2 py-1 text-sm font-mono text-grove-amber hover:text-grove-amber-bright border border-grove-border hover:border-grove-amber transition-colors"
+                >
+                  {apiKey ? 'Edit' : 'Configure'}
+                </button>
+              </div>
+              {!apiKey && (
+                <span className="text-xs text-grove-text-dim">
+                  Demo mode available without key
                 </span>
               )}
-              <button
-                onClick={handleStartEdit}
-                className="px-2 py-1 text-sm font-mono text-grove-amber hover:text-grove-amber-bright border border-grove-border hover:border-grove-amber transition-colors"
-              >
-                {apiKey ? 'Edit' : 'Configure'}
-              </button>
-            </>
+            </div>
           )}
         </div>
       </div>
