@@ -428,7 +428,8 @@ export default function App() {
     const templateHash = hashSubjectConfig(defaultSubjectTemplate)
 
     try {
-      const result = await executeCognitiveRequest(subjectPrompt, {
+      // Use research-enabled request with web search for real-time intel
+      const result: ResearchResult = await executeResearchRequest(subjectPrompt, {
         provider: 'anthropic',
         model: 'claude-sonnet-4-20250514',
         apiKey,
