@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "express": "^4.21.0",
     "@anthropic-ai/sdk": "^0.78.0",
     "@google/generative-ai": "^0.24.1",
     "openai": "^6.25.0",
