@@ -7,7 +7,7 @@ const commitHash = execSync('git rev-parse --short HEAD').toString().trim()
 
 export default defineConfig({
   plugins: [react()],
-  base: '/autonomaton/',
+  base: '/autonomaton-demo/',
   define: {
     __COMMIT_HASH__: JSON.stringify(commitHash),
   },

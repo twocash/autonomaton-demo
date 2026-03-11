@@ -12,7 +12,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Foundry Compiler Ledger', () => {
   test('should show ticktock logs before LLM stream', async ({ page }) => {
     // Navigate to Foundry
-    await page.goto('http://localhost:5180/autonomaton/')
+    await page.goto('http://localhost:5180/autonomaton-demo/')
 
     // Wait for page to load
     await page.waitForSelector('text=Grove Autonomaton Pattern')
