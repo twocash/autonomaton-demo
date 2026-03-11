@@ -12,11 +12,50 @@ import {
   createContext,
   useContext,
   useReducer,
+  useEffect,
   type ReactNode,
   type Dispatch,
 } from 'react'
 import { appReducer, initialState } from './reducer'
 import type { AppState, AppAction } from './types'
+
+// =============================================================================
+// PERSISTENCE
+// =============================================================================
+
+const WATCHLIST_STORAGE_KEY = 'signal_watch_watchlist_state'
+const SKILLS_STORAGE_KEY = 'signal_watch_skills_state'
+const ROUTING_STORAGE_KEY = 'signal_watch_routing_config'
+const ZONES_STORAGE_KEY = 'signal_watch_zones_schema'
+
+function loadPersistedState(): Partial<AppState> {
+  if (typeof window === 'undefined') return {}
+
+  try {
+    const persisted: Partial<AppState> = {}
+
+    const watchlist = localStorage.getItem(WATCHLIST_STORAGE_KEY)
+    if (watchlist) persisted.watchlist = JSON.parse(watchlist)
+
+    const skills = localStorage.getItem(SKILLS_STORAGE_KEY)
+    if (skills) persisted.skills = JSON.parse(skills)
+
+    const routing = localStorage.getItem(ROUTING_STORAGE_KEY)
+    if (routing) persisted.routingConfig = JSON.parse(routing)
+
+    const zones = localStorage.getItem(ZONES_STORAGE_KEY)
+    if (zones) persisted.zonesSchema = JSON.parse(zones)
+
+    return persisted
+  } catch {
+    return {}
+  }
+}
+
+function getInitialState(): AppState {
+  const persisted = loadPersistedState()
+  return { ...initialState, ...persisted }
+}
 
 // =============================================================================
 // CONTEXT
@@ -38,7 +77,24 @@ interface AppProviderProps {
 }
 
 export function AppProvider({ children }: AppProviderProps) {
-  const [state, dispatch] = useReducer(appReducer, initialState)
+  const [state, dispatch] = useReducer(appReducer, null, getInitialState)
+
+  // Persist state changes to localStorage
+  useEffect(() => {
+    localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(state.watchlist))
+  }, [state.watchlist])
+
+  useEffect(() => {
+    localStorage.setItem(SKILLS_STORAGE_KEY, JSON.stringify(state.skills))
+  }, [state.skills])
+
+  useEffect(() => {
+    localStorage.setItem(ROUTING_STORAGE_KEY, JSON.stringify(state.routingConfig))
+  }, [state.routingConfig])
+
+  useEffect(() => {
+    localStorage.setItem(ZONES_STORAGE_KEY, JSON.stringify(state.zonesSchema))
+  }, [state.zonesSchema])
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
