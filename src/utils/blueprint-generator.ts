@@ -182,9 +182,9 @@ export function generateBlueprintHTML(
     </div>
     <div style="text-align: right;">
       <span style="color: #B0A898;">Prompt Schema:</span>
-      <a href="https://github.com/twocash/grove-autonomaton-pattern/blob/master/src/config/prompts.schema.ts" target="_blank" style="color: #4CAF72; text-decoration: none; border-bottom: 1px dotted #4CAF72;">v1.0 (View Source)</a><br/>
+      <a href="https://github.com/twocash/autonomaton-demo/blob/master/src/config/prompts.schema.ts" target="_blank" style="color: #4CAF72; text-decoration: none; border-bottom: 1px dotted #4CAF72;">v1.0 (View Source)</a><br/>
       <span style="color: #D4621A; font-size: 14px; font-weight: bold;">
-        PIPELINE HASH: <a href="https://github.com/twocash/grove-autonomaton-pattern" target="_blank" style="color: #D4621A; text-decoration: none;">#${escapeHtml(pipelineSignature)}</a>
+        PIPELINE HASH: <a href="https://github.com/twocash/autonomaton-demo" target="_blank" style="color: #D4621A; text-decoration: none;">#${escapeHtml(pipelineSignature)}</a>
       </span>
     </div>
   </div>

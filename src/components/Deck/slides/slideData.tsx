@@ -576,7 +576,7 @@ function SlideFinal({ active }: { active: boolean }) {
           <p className="font-mono text-[12px] text-grove-text-dim mt-2">Any no → You know exactly what to fix.</p>
           <div className="mt-6 p-4 border border-grove-border">
             <div className="font-mono text-[10px] text-grove-amber mb-2">REFERENCE IMPLEMENTATION</div>
-            <div className="font-mono text-[12px] text-grove-text-dim">Grove Autonomaton Pattern — github.com/twocash/grove-autonomaton-pattern</div>
+            <div className="font-mono text-[12px] text-grove-text-dim">Autonomaton Demo — github.com/twocash/autonomaton-demo</div>
             <div className="text-[12px] text-grove-text-dim mt-2">License: CC BY 4.0 — The pattern is open because the thesis requires it.</div>
           </div>
         </div>
