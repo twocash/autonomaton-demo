@@ -29,7 +29,8 @@ import { DashboardView } from './components/Dashboard'
 import { ConfigPanel } from './components/Config'
 import { FlywheelView } from './components/Flywheel'
 import { CostEvaporation } from './components/CostEvaporation'
-import { useAppDispatch, useAppState } from './state/context'
+import { DiagnosticCard } from './components/Diagnostic/DiagnosticCard'
+import { useAppDispatch, useAppState, usePipeline } from './state/context'
 import type { CurrentView } from './state/types'
 import { executeCognitiveRequest, executeResearchRequest, type ResearchResult } from './services/CognitiveAdapter'
 import { shouldProposeSkill, generatePatternDescription, getAdjustmentPatternKey, getBriefMeOnPatternKey } from './services'
@@ -83,6 +84,7 @@ function loadDomainConfig(): DomainConfig | null {
 export default function App() {
   const dispatch = useAppDispatch()
   const appState = useAppState()  // For flywheel pattern tracking
+  const pipeline = usePipeline()  // For Andon gate DiagnosticCard
 
   // Local state for briefings and watchlist (persisted to localStorage)
   const [briefings, setBriefings] = useState<Briefing[]>(loadBriefings)
@@ -1111,19 +1113,16 @@ export default function App() {
 
     // Phase 1: Domain setup
     if (domainSetupPhase === 'industry') {
-      // ANDON GATE: Check for API key first
+      // ANDON GATE: Route through pipeline halt mechanism
       if (!apiKey) {
-        addTelemetry({
-          intent: 'configure_domain',
-          tier: 0,
-          zone: 'red',
-          confidence: 0,
-          cost: 0,
-          mode: 'interactive',
-          latencyMs: 0,
-          humanFeedback: null,
-          skillMatch: null,
-          message: `⚠️ API key required. Click "Configure" in the header (upper right) to set your Anthropic API key.`,
+        dispatch({
+          type: 'HALT_PIPELINE',
+          reason: {
+            stage: 'compilation',
+            error: 'Missing API Key: Domain configuration requires Anthropic credentials',
+            expected: 'Anthropic API key configured in header',
+            proposedFix: 'Click "Configure" in the header (upper right) to add your Anthropic API key',
+          },
         })
         return
       }
@@ -1144,19 +1143,16 @@ export default function App() {
       setPendingIndustry(input)
       setDomainSetupPhase('tracking')
     } else if (domainSetupPhase === 'tracking' && pendingIndustry) {
-      // ANDON GATE: Check for API key
+      // ANDON GATE: Route through pipeline halt mechanism
       if (!apiKey) {
-        addTelemetry({
-          intent: 'configure_domain',
-          tier: 0,
-          zone: 'red',
-          confidence: 0,
-          cost: 0,
-          mode: 'interactive',
-          latencyMs: 0,
-          humanFeedback: null,
-          skillMatch: null,
-          message: `⚠️ API key required. Click "Configure" in the header to set your Anthropic API key.`,
+        dispatch({
+          type: 'HALT_PIPELINE',
+          reason: {
+            stage: 'compilation',
+            error: 'Missing API Key: Domain configuration requires Anthropic credentials',
+            expected: 'Anthropic API key configured in header',
+            proposedFix: 'Click "Configure" in the header (upper right) to add your Anthropic API key',
+          },
         })
         return
       }
@@ -1334,6 +1330,16 @@ export default function App() {
       <Header />
       <NavBar currentView={appState.currentView} onViewChange={handleViewChange} />
       <PipelineVisualization />
+
+      {/* Andon Gate — DiagnosticCard for pipeline halts */}
+      {pipeline.halted && pipeline.haltReason && (
+        <div className="px-6 py-4 bg-grove-bg2 border-b border-grove-border">
+          <DiagnosticCard
+            reason={pipeline.haltReason}
+            onReset={() => dispatch({ type: 'RESET_PIPELINE' })}
+          />
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 flex min-h-0 overflow-hidden">
