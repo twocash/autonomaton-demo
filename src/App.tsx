@@ -1108,54 +1108,85 @@ export default function App() {
   }
 
   // CommandBar submit handler (extracted for reuse)
-  const handleCommandBarSubmit = (input: string) => {
+  // ALL operations flow through pipeline stages with zone governance
+  const handleCommandBarSubmit = async (input: string) => {
     const apiKey = localStorage.getItem(API_KEY_STORAGE_KEY)
+
+    // Helper: Animate through pipeline stages (every operation is an Autonomaton)
+    const animatePipeline = async (
+      intent: string,
+      tier: 0 | 1 | 2 | 3,
+      zone: 'green' | 'yellow' | 'red',
+      requiresApiKey: boolean
+    ) => {
+      // Reset and start pipeline
+      dispatch({ type: 'RESET_PIPELINE' })
+
+      // Stage 1: Telemetry
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'telemetry', state: 'active' })
+      await new Promise(r => setTimeout(r, 150))
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'telemetry', state: 'complete' })
+
+      // Stage 2: Recognition
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'recognition', state: 'active' })
+      await new Promise(r => setTimeout(r, 200))
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'recognition', state: 'complete' })
+
+      // Stage 3: Compilation — ANDON GATE
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'compilation', state: 'active' })
+      await new Promise(r => setTimeout(r, 150))
+
+      // Andon Gate: Check API key if required
+      if (requiresApiKey && !apiKey) {
+        dispatch({
+          type: 'HALT_PIPELINE',
+          reason: {
+            stage: 'compilation',
+            error: `Missing API Key: ${intent} requires Anthropic credentials`,
+            expected: 'Anthropic API key configured in header',
+            proposedFix: 'Click "Configure" in the header (upper right) to add your Anthropic API key',
+          },
+        })
+        return false // Halt — don't proceed
+      }
+
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'compilation', state: 'complete' })
+
+      // Stage 4: Approval (zone-dependent)
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'approval', state: 'active' })
+      await new Promise(r => setTimeout(r, zone === 'yellow' ? 300 : 100))
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'approval', state: 'complete' })
+
+      // Stage 5: Execution
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'execution', state: 'active' })
+
+      // Log telemetry
+      addTelemetry({
+        intent,
+        tier,
+        zone,
+        confidence: 0.9,
+        cost: tier === 0 ? 0 : tier === 1 ? 0.001 : tier === 2 ? 0.01 : 0.1,
+        mode: apiKey ? 'interactive' : 'demo',
+        latencyMs: 0,
+        humanFeedback: null,
+        skillMatch: null,
+      })
+
+      return true // Proceed
+    }
 
     // Phase 1: Domain setup
     if (domainSetupPhase === 'industry') {
-      // ANDON GATE: Route through pipeline halt mechanism
-      if (!apiKey) {
-        dispatch({
-          type: 'HALT_PIPELINE',
-          reason: {
-            stage: 'compilation',
-            error: 'Missing API Key: Domain configuration requires Anthropic credentials',
-            expected: 'Anthropic API key configured in header',
-            proposedFix: 'Click "Configure" in the header (upper right) to add your Anthropic API key',
-          },
-        })
-        return
-      }
+      const proceed = await animatePipeline('configure_domain', 1, 'green', true)
+      if (!proceed) return
 
-      // Key exists - proceed with domain setup
-      addTelemetry({
-        intent: 'configure_domain',
-        tier: 1,
-        zone: 'green',
-        confidence: 0.9,
-        cost: 0,
-        mode: 'demo',
-        latencyMs: 50,
-        humanFeedback: null,
-        skillMatch: null,
-        message: `Domain identified: "${input}" — what signals do you want to track?`,
-      })
+      dispatch({ type: 'SET_PIPELINE_STAGE', stage: 'execution', state: 'complete' })
       setPendingIndustry(input)
       setDomainSetupPhase('tracking')
     } else if (domainSetupPhase === 'tracking' && pendingIndustry) {
-      // ANDON GATE: Route through pipeline halt mechanism
-      if (!apiKey) {
-        dispatch({
-          type: 'HALT_PIPELINE',
-          reason: {
-            stage: 'compilation',
-            error: 'Missing API Key: Domain configuration requires Anthropic credentials',
-            expected: 'Anthropic API key configured in header',
-            proposedFix: 'Click "Configure" in the header (upper right) to add your Anthropic API key',
-          },
-        })
-        return
-      }
+      const proceed = await animatePipeline('configure_domain', 2, 'yellow', true)
+      if (!proceed) return
 
       handleConfigureDomain(pendingIndustry, input)
       setDomainSetupPhase('awaiting_approval')
