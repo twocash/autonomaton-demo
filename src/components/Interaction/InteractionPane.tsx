@@ -76,7 +76,11 @@ export function InteractionPane() {
     setInput('')
 
     try {
-      await processInteraction(input, state, dispatch)
+      // Force interactive mode for custom input (bypasses React batching race condition)
+      // The onKeyDown handler dispatches SET_MODE, but state may not have updated yet
+      const interactiveState = { ...state, mode: 'interactive' as const }
+      dispatch({ type: 'SET_MODE', mode: 'interactive' })
+      await processInteraction(input, interactiveState, dispatch)
     } finally {
       setProcessing(false)
     }
