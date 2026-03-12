@@ -1296,7 +1296,16 @@ export default function App() {
 
             {/* CENTER: Briefing Inbox + CommandBar (2/3 of remaining space) */}
             <div className="flex-[2] min-w-0 border-r border-grove-border flex flex-col">
-              <div className="flex-1 min-h-0">
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                {/* Andon Gate — DiagnosticCard for pipeline halts (appears in inbox) */}
+                {pipeline.halted && pipeline.haltReason && (
+                  <div className="p-4">
+                    <DiagnosticCard
+                      reason={pipeline.haltReason}
+                      onReset={() => dispatch({ type: 'RESET_PIPELINE' })}
+                    />
+                  </div>
+                )}
                 <BriefingInbox
                   briefings={briefings}
                   onApprove={handleApprove}
@@ -1361,16 +1370,6 @@ export default function App() {
       <Header />
       <NavBar currentView={appState.currentView} onViewChange={handleViewChange} />
       <PipelineVisualization />
-
-      {/* Andon Gate — DiagnosticCard for pipeline halts */}
-      {pipeline.halted && pipeline.haltReason && (
-        <div className="px-6 py-4 bg-grove-bg2 border-b border-grove-border">
-          <DiagnosticCard
-            reason={pipeline.haltReason}
-            onReset={() => dispatch({ type: 'RESET_PIPELINE' })}
-          />
-        </div>
-      )}
 
       {/* Main Content */}
       <main className="flex-1 flex min-h-0 overflow-hidden">
